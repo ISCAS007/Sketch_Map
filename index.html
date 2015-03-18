@@ -1,0 +1,224 @@
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="css/demo.css" />    <!-- common styles -->
+    <link rel="stylesheet" type="text/css" href="css/dialog.css" />    <!-- individual effect -->
+    <link rel="stylesheet" type="text/css" href="css/dialog-wilma.css" />
+    <link rel="stylesheet" type="text/css" href="css/component.css">
+	<link rel="stylesheet" type="text/css" href="css/yzbx.css"></link>
+    <script src="js/modernizr.custom.js"></script>
+    <title>Map</title>
+</head>
+<body>
+<!--查询界面-->
+<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2"></nav>
+
+<table id="scene-tooltip" class="hidden" style="text-align: left; width: 50%;"
+border="1" cellpadding="2" cellspacing="2">
+<tbody>
+<tr>
+<td style="width: 50%;">Scene: <span id="scene-number1">1</span><br>
+Type: <span id="scene-type1">indoor</span> <br>
+Rolers:<span id="scene-people1"> neo</span> <br>
+Related Event: <span id="scene-related-event1">1,3,4</span><br>
+</td>
+<td style="width: 50%;">Scene: <span id="scene-number2">2</span><br>
+Type: <span id="scene-type2">indoor</span> <br>
+Rolers:<span id="scene-people2"> neo,smith,he</span><br>
+Related Event:<span id="scene-related-event2">5,7,11</span><br>
+</td>
+</tr>
+<tr>
+<td style="text-align: center;" colspan="2">Associated Event: <span id="scene-associated-event">1</span><br>
+Common Rolers: <span id="scene-people">neo</span> </td>
+</tr>
+</tbody>
+</table>
+
+<div class="container">
+    <div class="main">
+        <section class="buttonset">
+            <div class="container">
+                <div class="content">
+
+                    <div id="somedialog" class="dialog">
+                        <div class="dialog__overlay"></div>
+                        <div class="dialog__content">
+                            <div class="morph-shape">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 560 280" preserveAspectRatio="none">
+                                    <rect x="3" y="3" fill="none" width="556" height="276"/>
+                                </svg>
+                            </div>
+                            <div class="dialog-inner">
+                                <h2><strong>查询结果</strong>共有X条路径</h2>
+                                <div><button class="action" data-dialog-close id="OK">确定</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /content -->
+            </div>
+        </section>
+    </div>
+</div>
+<!--播放器-->
+<div id="player" class="show" style="position:absolute;left:800;top:400; opacity:1;visibility:hidden;width: 640px; height: 264px;">
+    <video id="pp" poster="pic/01-01.jpg"  controls="controls" src="video/1.mp4" type="video/mp4" />
+</div>
+<div ><button data-dialog="somedialog" class="trigger" id="showLeftPush" style= "position:absolute;right:200;top:200;" onclick="find()">查询</button></div>
+<div ><button data-dialog="somedialog" class="trigger" id="showSpecial" style= "position:absolute;right:200;top:400;" onclick="shows()">展示</button></div>
+<div ><button data-dialog="somedialog" class="trigger" id="reset" style= "position:absolute;right:200;top:300;" onclick="resets()">重置</button></div>
+<div id="tooltip" class="hildden">
+    <p><strong>提示：</strong></p>
+    <p><span id="value">100</span>%</p>
+</div>
+<script src="js/d3.min.js"></script>
+<script src="js/classie.js"></script>
+<script src="js/dialogFx.js"></script>
+<!--读取文件并展示-->
+<script src="js/ReadFile.js"></script>
+<!--各种功能函数-->
+<script src="js/yzbx.js"></script>
+<script>
+    var     menuLeft = document.getElementById( 'cbp-spmenu-s2' ),
+            //showLeftPush = document.getElementById( 'OK' ),
+            body = document.body;
+    /*
+	showLeftPush.onclick = function() {
+        classie.toggle( this, 'active' );
+		
+        classie.toggle( body, 'cbp-spmenu-push-toleft' );
+        classie.toggle( menuLeft, 'cbp-spmenu-open' );
+		//create_button(3);
+    };
+	*/
+    var shows=function(){
+        setvalue();
+        g.selectAll("image.circle").attr("display", function (d) {
+            var result=checkdis(d);
+        return result;});
+        g.selectAll("path.spot").attr("display",function(d){
+            var result=checkdis(d);
+            return result;});
+    };
+    /*(function() {
+        var dlgtrigger = document.querySelector( '[data-dialog]' ),
+                somedialog = document.getElementById( dlgtrigger.getAttribute( 'data-dialog' ) ),
+                dlg = new DialogFx( somedialog );
+        dlgtrigger.addEventListener( 'click', dlg.toggle.bind(dlg) );
+
+    })();
+	*/
+	
+	var find=function(){
+		console.log("show the path .................................");
+		//显示路径数目并创建相应的按钮
+		if(cnt==2&&Nu[0]<Nu[1]){
+			var pointNum=dataEvent.length;
+			var timeManPathArray=getTimeLinePath(Nu,Na,dataLines,pointNum,dataRoler);
+			
+			create_button(timeManPathArray.length);
+			//d3.select("div.dialog-inner").select("h2").text("共有"+timeManPathArray.length+"条路径");
+			//classie.toggle( this, 'active' );
+			
+			//显示路径
+			d3.selectAll("button.path")
+			.data(timeManPathArray)
+			.on("click",function(d){
+				//d 为某条时间线路径
+				//g.selectAll("path.time").attr("display","none");
+				g.selectAll("path.spot").attr("display","none");
+				
+				console.log("显示路径 d is "+d);
+				for (var i=0;i<d.length;i++)
+				{
+					console.log(d[i]);
+				}
+				//var timevalue=getTimeLineValue(dataLine,d);
+				//console.log("time value is "+timevalue);
+				//dataRoler 事件角色点的集合
+				//timeManValueArray={from,to,rolerNum}
+				var timeManLineArray=getTimeManValueArray(rolerPos,d,Na);
+				//console.log("timeManValueArray is "+timeManValueArray);
+				console.log("Na is "+Na);
+				g.selectAll("path.timeMan").remove();
+				
+				//createAbsLine(g,timeManLineArray);
+				g.selectAll("path.timeMan")
+					.data(timeManLineArray[0])
+					.enter()
+					.append("path")
+					.attr("class","timeMan")
+					.attr("stroke-width", 1)
+					.attr("fill", "none")
+					.attr("d", path);
+					/*.attr("d",function(d){
+						var att="M"+d.coordinates[0][0]+" "+d.coordinates[0][0]
+									+"L"+d.coordinates[1][0]+" "+d.coordinates[1][1]+" Z";
+						return att;
+					})*/
+					
+				g.selectAll("path.timeMan")
+					.data(timeManLineArray[1])
+					.attr("stroke",function(d){
+						if(d==1){
+							return color(Nam(Na[0]));
+						}
+						else if(d==2)
+						{
+							return color(Nam(Na[1]));
+						}
+						else{	//d.rolerNum==3
+							return color(19);	//最后一种颜色
+							//return "red";
+						}
+					})
+					.attr("display","block");
+					
+				createAPath(g,[[433,347],[347,433],[522,335],[600,400],[400,600]]);
+			});
+			
+			
+			/*
+			var dlgtrigger = document.querySelector( '[data-dialog]' ),
+                somedialog = document.getElementById( dlgtrigger.getAttribute( 'data-dialog' ) ),
+                dlg = new DialogFx( somedialog );
+			dlgtrigger.addEventListener( 'click', dlg.toggle.bind(dlg) );
+			*/
+			
+			//classie.toggle( this, 'active' );
+			
+			classie.toggle( document.body, 'cbp-spmenu-push-toleft' );
+			classie.toggle( menuLeft, 'cbp-spmenu-open' );
+		}
+		else{
+			//提示出错：请选择两个点进行查询
+			alert("请选择两个点进行查询并按按照时间顺序选取");
+			//d3.select("div.dialog-inner").select("h2").text("<strong>请选择两个点进行查询</strong>");
+		}
+	
+	}
+    function create_button(arr){
+        var str="";
+        str+="<h3"+">Menu<"+"/h3>";
+        for(var i=1;i<=arr;i++){
+            str+='<button  class="path" id="no'+i+'" >'+'路径'+i+"<"+'/'+"button>";
+        }
+    str+='<button  id='+"close" +'>'+'关闭'+"<"+'/'+"button>";
+
+        document.getElementById("cbp-spmenu-s2").innerHTML=str;
+        var shutdo = document.getElementById( 'close' );
+        shutdo.onclick = function() {
+
+            classie.toggle( this, 'active' );
+            classie.toggle( body, 'cbp-spmenu-push-toleft' );
+            classie.toggle( menuLeft, 'cbp-spmenu-open' );
+        };
+    }
+
+</script>
+</body>
+</html>
