@@ -268,8 +268,8 @@ function showEventPath(eventchoose,eventline,eventId2Num){
 
 //var backgroundColorSet=["#0000ff","#00ff00","#ff0000","#ffff00"];//青，绿，
 //var backgroundColors=[3,1,0,2,1,2,2,0,2,1,1,0,3,2,3,1,0,2,1,2,2,0,2,1,1,0,3,2];
-var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#bad6d8","#f8d4a2","#fbb4ae","#d4d2d6","#c1ded2"];
-var reflection=[0,2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
+var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#f8d4a2","#fbb4ae","#bad6d8","#d4d2d6","#c1ded2"];
+var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 //var backgroundColors=[4,1,4,4,1,  4,4,1,4,4,  4,1,4,4,1,  1,1,1,1,1,  1,1,1,1];
 //event=[1:13]  <==>   index=[+14,+1,+16,+15,+4,  +17,+19,+20,+11,+23,  +18,+21,+22,+7]
 var cnt=0;
@@ -289,7 +289,7 @@ var eventchoose=new Array(2);
 var eventchoosenum=0;
 
 //对应相应块的id
-var eventNum2Id=[+14,+1,+16,+15,+4,  +17,+19,+20,+11,+23,  +18,+21,+22,+7];
+
 var eventId2Num=[0, 2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
 
 function mousePos(e){ 
@@ -408,12 +408,12 @@ d3.json("json//Geo.json", function(error, root) {
 		.attr("id",function(d,i){
 			return "path-background"+i;
 		})
-        .attr("fill", function(d,i){
+        .attr("fill", function(d){
             //return color(i);
-			return backgroundColorSet[reflection[i]];
+			return backgroundColorSet[reflection[d.number-1]];
         })
-		.attr("opacity",0.5)
-		.attr("full-opacity",0.5)
+		.attr("opacity",1)
+		.attr("full-opacity",1)
 		//.attr("fill-rule","evenodd")
 		//.attr("stroke-width",1)
 		.attr("stroke-dasharray",0.986192,0.591715,0.197238,0.591715)
@@ -427,6 +427,11 @@ d3.json("json//Geo.json", function(error, root) {
                 .style("top",yPosition+"px")
                 .select("#value")
                 .text(d.number);
+        })
+        .on("mouseout",function(d){
+            d3.select("#tooltip")
+                .select("#value")
+                .text(100);
         })
 		.on("click",function(d,i){
 			
