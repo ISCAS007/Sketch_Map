@@ -9,16 +9,16 @@ var svg = d3.select("body").append("svg")
     .attr("transform", "translate(0,0)");
 //from spherical coordinates (in degrees) to Cartesian coordinates (in pixels):	projection()
 //from Cartesian coordinates (in pixels) to spherical coordinates (in degrees)	projection.invert()
-var projection = d3.geo.mercator()
-    .center([117, 26])
-    .scale(800)
-    .translate([width/2, height/2]);
+var projection =  d3.geo.equirectangular()
+    .scale(153)
+    .translate([width / 2, height / 2])
+    .precision(.1);
 
 var path = d3.geo.path()
     .projection(projection);
 
 var zoom = d3.behavior.zoom()
-    .scaleExtent([1, 12])
+    .scaleExtent([0.1, 12])
     .on("zoom", zoomed);
 var color = d3.scale.category20();
 var displayrolers=[true,true,true,true,true,true,true,true,true,true,true,true,true,true];
@@ -268,8 +268,8 @@ function showEventPath(eventchoose,eventline,eventId2Num){
 
 //var backgroundColorSet=["#0000ff","#00ff00","#ff0000","#ffff00"];//青，绿，
 //var backgroundColors=[3,1,0,2,1,2,2,0,2,1,1,0,3,2,3,1,0,2,1,2,2,0,2,1,1,0,3,2];
-var backgroundColorSet=["#000000","#9FB7D8","#61BAE4","#EBA570","#0093CC","#6272A9","#9FB7D8","#61BAE4","#9592BC","#EBAF92","#9FB7D8","#F8C300","#0093CC","#EBA570","#E9811A"];
-var reflection=[0,   2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
+var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#bad6d8","#f8d4a2","#fbb4ae","#d4d2d6","#c1ded2"];
+var reflection=[0,2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
 //var backgroundColors=[4,1,4,4,1,  4,4,1,4,4,  4,1,4,4,1,  1,1,1,1,1,  1,1,1,1];
 //event=[1:13]  <==>   index=[+14,+1,+16,+15,+4,  +17,+19,+20,+11,+23,  +18,+21,+22,+7]
 var cnt=0;
@@ -283,7 +283,6 @@ eventlocation event所在经纬度 eventlocation=array[eventnum][2];
 rolerlocation roler所在经纬度 rolerlocation=array[eventnum][rolernum][2];
 */
 var eventpos,rolerPos,rolersPerEvent,eventlocation,rolerlocation;
-var eventadjmat=[];
 //绘制地图
 //eventchoose=[event1,event2];
 var eventchoose=new Array(2);
@@ -291,7 +290,7 @@ var eventchoosenum=0;
 
 //对应相应块的id
 var eventNum2Id=[+14,+1,+16,+15,+4,  +17,+19,+20,+11,+23,  +18,+21,+22,+7];
-var eventId2Num=[0,   2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
+var eventId2Num=[0, 2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
 
 function mousePos(e){ 
         var x,y; 
@@ -356,46 +355,14 @@ function getCommonRolers(SceneNumber,SceneData,RolerNum,roler2num,num2roler)
 }
 function showSceneTooltip(SceneNumber,pos,str)
 {
-	if(eventadjmat.length==0){
-		eventadjmat=getEventAdjMatrix(dataLine,15);
-	}
-	
-	var relatEvent1=[];
-	var relatEvent2=[];
-	var commonRelatEvent=[];
-	for(var i=1;i<15;i++)
-	{
-		if(eventadjmat[i][SceneNumber[0]]==1)	{
-			if(eventadjmat[i][SceneNumber[1]]==1) commonRelatEvent.push(i);
-			relatEvent1.push(i);
-		}
-		
-		if(eventadjmat[i][SceneNumber[1]]==1)	relatEvent2.push(i);
-		
-	}
-	
-	for(var i=1;i<15;i++)
-	{
-		if(eventadjmat[SceneNumber[0]][i]==1)	{
-			if(eventadjmat[SceneNumber[1]][i]==1) commonRelatEvent.push(i);
-			relatEvent1.push(i);
-		}
-		
-		if(eventadjmat[SceneNumber[1]][i]==1) relatEvent2.push(i);
-	}
-	
-	console.log("related Event "+relatEvent1+"---"+relatEvent2+"-->"+commonRelatEvent);
 	console.log("showSceneTooltip ..."+SceneNumber+" "+str);
 	//console.log(d3.mouse(d3.select("body").select("svg")));
 	//x=document.documentElement.scrollLeft;//+event.clientX;
 	//y=document.documentElement.scrollTop;//+event.clientY;
 	//console.log("x is "+x+" y is "+y);
-	var x=pos[0]-300;
-	var y=pos[1]-300;
+	var x=pos[0]+10;
+	var y=pos[0]+10;
 	var tooltip=d3.select("#scene-tooltip");
-	tooltip.select("#scene-related-event1").text(relatEvent1);
-	tooltip.select("#scene-related-event2").text(relatEvent2);
-	tooltip.select("#scene-associated-event").text(commonRelatEvent);
 	//tooltip.select("#scene-number").text(SceneNumber[0]+","+SceneNumber[1]);
 	tooltip.select("#scene-people").text(str);
 	tooltip.attr("class","show")
@@ -424,10 +391,10 @@ function curvePath(location,projection)
 	//svg_path.attr("d","M"+location[0]+" C"+s+" "+e+" "+location[1]);
 	return str;
 }
+
 d3.json("json//Geo.json", function(error, root) {
     if (error)
         return console.error(error);
-    //console.log(root.Ma.geometries);
     dataMap = root.Ma.geometries;
     g.selectAll("path.background")
         .data(dataMap)
@@ -451,6 +418,16 @@ d3.json("json//Geo.json", function(error, root) {
 		//.attr("stroke-width",1)
 		.attr("stroke-dasharray",0.986192,0.591715,0.197238,0.591715)
         .attr("d", path )
+        .on("mouseover",function(d){
+            var xPosition=parseFloat(d3.event.x);
+            var yPosition=parseFloat(d3.event.y);
+
+            d3.select("#tooltip")
+                .style("left",xPosition+"px")
+                .style("top",yPosition+"px")
+                .select("#value")
+                .text(d.number);
+        })
 		.on("click",function(d,i){
 			
 			if(eventchoosenum==0){
@@ -500,6 +477,7 @@ d3.json("json//Geo.json", function(error, root) {
 				d3.select("#scene-tooltip").attr("class","hidden");
 			}
 		});
+
     //绘制情节线
 	//style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:30,30;stroke-dashoffset:0"
     dataLines = root.LINES.geometries;
@@ -579,32 +557,15 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("height", 100)
 		//.translate([-61.695,-106.195])
         .on("mouseover", function (d, i, e) {
-            var xPosition=parseFloat(d3.event.x);
-            var yPosition=parseFloat(d3.event.y);
 
-            d3.select("#tooltip")
-                .style("left",xPosition+"px")
-                .style("top",yPosition+"px")
-                .select("#value")
-                .text(d.number);
         })
         .on("click",function(d)
         {
-            var str="video/";
+            var str="http://localhost:63342/Sketch_Map/video/";
             str+= d.number+".mp4";
             clicked(str, d.number);
         });
-		/*
-    g.selectAll("text.event")
-        .data(dataEvent)
-        .enter()
-        .append("text")
-        .attr("class", "event")
-        .attr("x", function(d){return projection (d.coordinates)[0]-10})
-        .attr("y",function(d){return projection (d.coordinates)[1]-10})
-        .text(function(d){return "事件"+ d.number})
-        .style("font-size","10px");
-		*/
+
 	
 	
     //绘制角色点
@@ -706,13 +667,12 @@ function clicked(str,num) {
     var ppl=document.getElementById("pp");
     if (player.style.visibility == "hidden") {
         player.style.visibility="visible";
-        d3.selectAll("video")
-			.attr("src", str);
-        ppl.poster="pic/"+ num+"-01.jpg";
+        d3.selectAll("video").attr("src", str);
+        ppl.poster="http://localhost:63342/Sketch_Map/pic/"+ num+"-01.jpg";
     }
     else if(pp.src!=str) {
         pp.src = str;
-        ppl.poster = "pic/" + num + "-01.jpg";
+        ppl.poster = "http://localhost:63342/Sketch_Map/pic/" + num + "-01.jpg";
     }
     else {
         player.style.visibility = "hidden";
