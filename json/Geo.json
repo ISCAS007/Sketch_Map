@@ -43,6 +43,7 @@
 
     "Points":{"type":"GeometryCollection","geometries":[
     {"number":4,"name":"Morpheus","type":"Point","coordinates":[96.88113093700008,29.503458048000027]},
+	{"number":6,"name":"Morpheus","type":"Point","coordinates":[96.88113093700008,29.503458048000027]},
     {"number":8,"name":"Morpheus","type":"Point","coordinates":[104.13458494400004,28.711757533000025]},
     {"number":9,"name":"Morpheus","type":"Point","coordinates":[108.50387249400006,24.690937448000057]},
     {"number":10,"name":"Morpheus","type":"Point","coordinates":[109.57766386000009,21.77914669100005]},
@@ -50,6 +51,7 @@
     {"number":12,"name":"Morpheus","type":"Point","coordinates":[113.56990708400008,24.512820413000043]},
     {"number":5,"name":"Morpheus","type":"Point","coordinates":[100.17520567800005,30.677655337000033]},
     {"number":5,"name":"Mouse","type":"Point","coordinates":[100.55795585000004,30.156035463000023]},
+	{"number":6,"name":"Mouse","type":"Point","coordinates":[102.81273403100005,27.831442407000054]},
     {"number":8,"name":"Mouse","type":"Point","coordinates":[102.81273403100005,27.831442407000054]},
     {"number":10,"name":"Mouse","type":"Point","coordinates":[107.03454390700006,18.058763291000048]},
     {"number":1,"name":"Brown","type":"Point","coordinates":[85.91074698300008,23.319394413000055]},

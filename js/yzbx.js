@@ -307,9 +307,9 @@ return 3 表示显示并令其颜色为混合颜色
 function getInvertLocation(from,to)
 {
 	var location=[];
-	var xoff=25,yoff=25;
-	location.push(projection.invert([from[0]+xoff,from[1]+yoff]));
-	location.push(projection.invert([to[0]+xoff,to[1]+yoff]));
+	var xoff=-10,yoff=0;
+	location.push([from[0]+xoff,from[1]+yoff]);
+	location.push([to[0]+xoff,to[1]+yoff]);
 	
 	return location;
 }
@@ -335,16 +335,6 @@ function getTimeManValueArray(eventManPointArray,timeManPath,nameArray)
 	
 	for(var j=0;j+1<timeManPath.length;j++)
 	{
-		//var timeManEdge=timeManPath[j];
-		/*
-		if(timeManLineArray[i].s==timeManPath[j][0]&&timeManLineArray[i].e==timeManPath[j][1]&&
-			timeManLineArray[i].name==nameArray[timeManPath[j][2]-1])
-			{
-				timeManValueArray[i]=1;
-				break;
-			}
-			*/
-		
 		line=new Object();
 		line.type="LineString";
 		from=getCoordinates(timeManPath[j][0],nameArray[timeManPath[j][2]-1],eventManPointArray);
@@ -453,44 +443,7 @@ function createAPath(g,points)
 		.attr("display","block");
 		
 		
-	}
-
-/*
-//显示路径
-if(cnt==2&&Nu[0]<Nu[1])
-{
-	var pointNum=dataEvent.length;
-	var timeManPathArray=getTimeLinePath(Nu,Na,dataLine,pointNum,dataRoler)
-	
-	//显示路径
-	d3.selectAll("button#no")
-	.data(timeManPathArray)
-	.enter()
-	.append("button")
-	.attr("id","no")
-	.text(function(d,i){
-		return "路径"+i;
-	})
-	.on("click",function(d){
-		//d 为某条时间线路径
-		//g.selectAll("path.time").attr("display","none");
-		g.selectAll("path.spot").attr("display","none");
-		
-		//var timevalue=getTimeLineValue(dataLine,d);
-		//console.log("time value is "+timevalue);
-		//dateLines 时间人物线， dataLine 时间线
-		var timeManValueArray=getTimeManValueArray(dataLines,d,Na);
-		
-		g.selectAll("path.spot")
-			.data(timeManValueArray)
-			.attr("display",function(d){
-				if(d==0) return "none";
-				else return "block";
-			});
-	});
 }
-        
-*/
 
 function getEventLocation(eventpos)
 {

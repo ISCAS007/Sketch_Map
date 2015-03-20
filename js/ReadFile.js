@@ -2,6 +2,7 @@ var width  = 1250;
 var height = 850;
 var Na=[];
 var Nu=[];
+var rolernum=14,eventnum=14,scenenum=14;
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
@@ -10,6 +11,7 @@ var svg = d3.select("body").append("svg")
 //from spherical coordinates (in degrees) to Cartesian coordinates (in pixels):	projection()
 //from Cartesian coordinates (in pixels) to spherical coordinates (in degrees)	projection.invert()
 var projection =  d3.geo.equirectangular()
+//var projection=d3.geo.mercator()
     .scale(153)
     .translate([width / 2, height / 2])
     .precision(.1);
@@ -23,6 +25,24 @@ var zoom = d3.behavior.zoom()
 var color = d3.scale.category20();
 var displayrolers=[true,true,true,true,true,true,true,true,true,true,true,true,true,true];
 var g = svg.append("g");
+
+var scene2event=[0, 2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
+var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#f8d4a2","#fbb4ae","#bad6d8","#d4d2d6","#c1ded2"];
+var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
+var cnt=0;
+var dataMap,dataEvent,dataRoler;	//from json
+var dataEventLine,dataRolerLine;
+var absEventRolerPos;
+var absEventPos;
+var rolerOffset=[-10,0];
+var picOffset=[-25,-30,-50,-55];
+
+//eventchoose=[event1,event2];
+var eventchoose=new Array(2);
+var eventchoosenum=0;
+
+
+
 svg.append("rect")
     .attr("class", "overlay")
     .attr("width", width)
@@ -30,113 +50,7 @@ svg.append("rect")
 svg.call(zoom)
     .call(zoom.event);
 
-var Nam=function(d){
-    switch (d)
-    {
-        case "Apoc": return 0;
-        case "Neo": return 1;
-        case "Trinity": return 2;
-        case "Morpheus": return 3;
-        case "Dozer": return 4;
-        case "Cypher": return 5;
-        case "Oracle": return 6;
-        case "Robots": return 7;
-        case "Mouse": return 8;
-        case "Switch": return 9;
-        case "Tank": return 10;
-        case "Smith": return 11;
-        case "Brown": return 12;
-        case "Jones": return 13;
 
-
-    }
-};
-
-function num2roler(num)
-{
-    switch (num)
-    {
-        case 0: return "Apoc";	//: return 0;
-        case 1: return "Neo";//: return 1;
-        case 2: return "Trinity";//: return 2;
-        case 3: return "Morpheus";//: return 3;
-        case 4: return "Dozer";//: return 4;
-        case 5: return "Cypher";//: return 5;
-        case 6: return "Oracle";//: return 6;
-        case 7: return "Robots";//: return 7;
-        case 8: return "Mouse";//: return 8;
-        case 9: return "Switch";//: return 9;
-        case 10: return "Tank";//: return 10;
-        case 11: return "Smith";//: return 11;
-        case 12: return "Brown";//: return 12;
-        case 13: return "Jones";//: return 13;
-    }
-}
-function getRolersNumPerEvent(dataRoler,dataEvent){
-    var RolersNumPerEvent=[];
-    var a;
-    for(var i=0;i<dataEvent.length;i++)
-    {
-        a=new Array(2);
-        a[0]=0;
-        a[1]=0;
-        RolersNumPerEvent.push(a);
-    }
-
-    var num;
-    for(var i=0;i<dataRoler.length;i++)
-    {
-        num=dataRoler[i].number-1;
-        RolersNumPerEvent[num][0]=RolersNumPerEvent[num][0]+1;
-    }
-
-    return RolersNumPerEvent;
-}
-var rolernum=14;
-function getRolerPos(dataRoler,rolersPerEvent,eventpos)
-{
-    var num,theta,x,y;
-    var set,matrix;
-    var RolerPos=new Array();
-    for (var i=0;i<rolersPerEvent.length;i++)
-    {
-        var matrix=new Array();
-        for(var j=0;j<rolernum;j++)
-        {
-            set=new Array(2);
-            set[0]=0;
-            set[1]=0;
-            matrix.push(set);
-        }
-        RolerPos.push(matrix);
-    }
-    var radius=20;
-    for(var i=0;i<dataRoler.length;i++)
-    {
-        num=dataRoler[i].number-1;
-
-        theta=2*Math.PI*rolersPerEvent[num][1]/rolersPerEvent[num][0];
-        //x=eventpos[2*num]+radius*Math.cos(theta)+15;
-        //y=eventpos[2*num+1]+radius*Math.sin(theta)+45;
-        x=eventpos[2*num]+radius*Math.cos(theta);
-        y=eventpos[2*num+1]+radius*Math.sin(theta)+25;
-        //console.log("x y theta is "+x+" "+y+" "+theta);
-        RolerPos[num][Nam(dataRoler[i].name)][0]=x;
-        RolerPos[num][Nam(dataRoler[i].name)][1]=y;
-        rolersPerEvent[num][1]=rolersPerEvent[num][1]+1;
-    }
-    /*
-     console.log("RolerPos is ......");
-     for(var i=0;i<RolerPos.length;i++)
-     {
-     for(var j=0;j<rolernum;j++)
-     {
-     console.log(i+" "+j+" "+num2roler(j)+" "+RolerPos[i][j]);
-     }
-     }
-     */
-    return RolerPos;
-}
 
 function getEventAdjMatrix(eventline,eventnum)
 {
@@ -184,10 +98,10 @@ function reverseEventPath(pathrecord,x,s)
         return [];
     }
 }
-function djstlEventPath(evetnchoose,eventline,eventId2Num)
+function djstlEventPath(evetnchoose,eventline,scene2event)
 {
-    var s=eventId2Num[eventchoose[0]];
-    var e=eventId2Num[eventchoose[1]];
+    var s=scene2event[eventchoose[0]];
+    var e=scene2event[eventchoose[1]];
 
     var adjmat=getEventAdjMatrix(eventline,15);
 
@@ -242,11 +156,11 @@ function djstlEventPath(evetnchoose,eventline,eventId2Num)
     return djstleventpath;
 }
 
-function showEventPath(eventchoose,eventline,eventId2Num){
-    var djstleventpath=djstlEventPath(eventchoose,eventline,eventId2Num);
+function showEventPath(eventchoose,eventline,scene2event){
+    var djstleventpath=djstlEventPath(eventchoose,eventline,scene2event);
     var showFlag=new Array(eventline.length);
-    var s=eventId2Num[eventchoose[0]];
-    var e=eventId2Num[eventchoose[1]];
+    var s=scene2event[eventchoose[0]];
+    var e=scene2event[eventchoose[1]];
     for(var i=0;i<eventline.length;i++)
     {
         showFlag[i]=0;
@@ -262,35 +176,6 @@ function showEventPath(eventchoose,eventline,eventId2Num){
             else return "none"
         })
 }
-
-
-
-
-//var backgroundColorSet=["#0000ff","#00ff00","#ff0000","#ffff00"];//青，绿，
-//var backgroundColors=[3,1,0,2,1,2,2,0,2,1,1,0,3,2,3,1,0,2,1,2,2,0,2,1,1,0,3,2];
-var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#f8d4a2","#fbb4ae","#bad6d8","#d4d2d6","#c1ded2"];
-var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
-//var backgroundColors=[4,1,4,4,1,  4,4,1,4,4,  4,1,4,4,1,  1,1,1,1,1,  1,1,1,1];
-//event=[1:13]  <==>   index=[+14,+1,+16,+15,+4,  +17,+19,+20,+11,+23,  +18,+21,+22,+7]
-var cnt=0;
-var dataMap,dataRoler,dataLine,datalines,dataEvent;
-
-/*
- eventpos event所在迪卡尔坐标 event=array[eventnum*2];
- rolerPos roler所在迪卡尔坐标 rolerpos=array[eventnum][rolernum][2];
- rolersPerEvent=array[eventnum][2]
- eventlocation event所在经纬度 eventlocation=array[eventnum][2];
- rolerlocation roler所在经纬度 rolerlocation=array[eventnum][rolernum][2];
- */
-var eventpos,rolerPos,rolersPerEvent,eventlocation,rolerlocation;
-//绘制地图
-//eventchoose=[event1,event2];
-var eventchoose=new Array(2);
-var eventchoosenum=0;
-
-//对应相应块的id
-
-var eventId2Num=[0, 2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
 
 function mousePos(e){
     var x,y;
@@ -373,24 +258,6 @@ function showSceneTooltip(SceneNumber,pos,str)
      }); */
 }
 
-function curvePath(location,projection)
-{
-    var s=new Array(2);
-    s[0]=location[0][0]*2/3+location[1][0]/3;
-    s[1]=location[0][1]*2/3+location[1][1]/3;
-    var e=new Array(2);
-    e[0]=location[1][0]*2/3+location[0][0]/3;
-    e[1]=location[1][1]*2/3+location[0][1]/3;
-
-    s[0]=s[0]-2;
-    s[1]=s[1]-0;
-    e[1]=e[1]+2;
-    e[1]=e[1]+0;
-    var str="M"+projection(location[0])+" C"+projection(s)+" "+projection(e)+" "+projection(location[1]);
-    console.log(str);
-    //svg_path.attr("d","M"+location[0]+" C"+s+" "+e+" "+location[1]);
-    return str;
-}
 
 d3.json("json//Geo.json", function(error, root) {
     if (error)
@@ -438,14 +305,14 @@ d3.json("json//Geo.json", function(error, root) {
                 else{
                     eventchoose[1]=i;
                     eventchoosenum=2;
-                    console.log("eventchoose is "+eventchoose+" number is "+eventId2Num[eventchoose[0]]+" "+eventId2Num[eventchoose[1]]);
+                    console.log("eventchoose is "+eventchoose+" number is "+scene2event[eventchoose[0]]+" "+scene2event[eventchoose[1]]);
                     g.selectAll("#path-background"+i)
                         .attr("stroke","red")
                         .attr("stroke-width",10);
 
                     //pos=mousePos(e);
                     pos=[400,400];
-                    var SceneNumber=[eventId2Num[eventchoose[0]],eventId2Num[eventchoose[1]]];
+                    var SceneNumber=[scene2event[eventchoose[0]],scene2event[eventchoose[1]]];
                     var CommonRolers=getCommonRolers(SceneNumber,dataRoler,14,Nam,num2roler);
                     showSceneTooltip(SceneNumber,pos,CommonRolers);
                 }
@@ -458,7 +325,7 @@ d3.json("json//Geo.json", function(error, root) {
                     .attr("stroke","white")
                     .attr("stroke-width",1);
 
-                //showEventPath(eventchoose,dataLine,eventId2Num)
+                //showEventPath(eventchoose,dataLine,scene2event)
                 //showEventPath(eventchoose);
                 eventchoosenum=0;
             }
@@ -468,55 +335,17 @@ d3.json("json//Geo.json", function(error, root) {
             }
         });
 
-    //绘制情节线
-    //style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:30,30;stroke-dashoffset:0"
-    dataLines = root.LINES.geometries;
-    g.selectAll("path.spot")
-        .data(dataLines)
-        .enter()
-        .append("path")
-        .attr("stroke", function(d){return color(Nam(d.name))})
-        .attr("stroke-width", 1)
-        .attr("fill", "none")
-        .attr("class","spot")
-        .attr("border-style","double")
-        .attr("stroke-dasharray",3,3)
-        .attr("stroke-dashoffset",0)
-        .attr("d", path);
-
-    //绘制时间线
-    dataLine = root.TimeLine.geometries;
-    g.selectAll("path.time")
-        .data(dataLine)
-        .enter()
-        .append("path")
-        .attr("stroke", "black")
-        .attr("stroke-width", function(d){
-            return d.len+2;
-        })
-        .attr("fill", "none")
-        .attr("class","time")
-        //.attr("d", path)
-        .attr("d",function(d){
-            //var location=[d.coordinates[0],d.coordinates[d.coordinates.length-1]];
-            var location=d.coordinates;
-            console.log("projection ... "+projection(d.coordinates[0])+" "+projection(d.coordinates[1]));
-            console.log("path ... "+path(d));
-            return curvePath(location,projection);
-        })
-        .on("mousedown", function (d, i, e) {
-            d3.select(this)
-                .attr("display", "none")
-        })
-        .on("mouseout", function (d, i) {
-            d3.select(this)
-                .attr("display","block")
-        });
-
+    
     //绘制事件点
 
-    dataEvent = root.Event.geometries;
-    eventpos=new Array(2*dataEvent.length);
+    var oldDataEvent = root.Event.geometries;
+	dataEvent=updateDataEvent(oldDataEvent);
+	//update ok! 
+	/* for(var i=0;i<dataEvent.length;i++)
+	{
+		//console.log("old dataEvent"+tmp[i].coordinates);
+		console.log("dataEvent "+i+" "+projection(dataEvent[i].coordinates));
+	}  */
     g.selectAll("image.event")
         .data(dataEvent)
         .enter()
@@ -528,20 +357,14 @@ d3.json("json//Geo.json", function(error, root) {
             return "SVG\\Event"+i+".svg";
             //return "pic\\EVENT.png"
         })
-        .attr("x", function(d,i){
-            var num=d.number-1;
-            //console.log("dataEvent.number "+num);
-            if(i==1) {
-                eventpos[2*num]=projection (d.coordinates)[0]-10-15+15;
-            }
-            else eventpos[2*num]=projection (d.coordinates)[0]-10-15;
-            return eventpos[2*num];
+        .attr("x", function(d){
+			//return d.coordinates[0];
+			//console.log("path vs projection"+path(d)+" "+projection(d.coordinates));
+			return projection(d.coordinates)[0];
         })
-        .attr("y",function(d,i){
-            var num=d.number-1;
-            if(i==1) eventpos[2*num+1]= projection (d.coordinates)[1]-10-53+25;
-            else eventpos[2*num+1]=projection (d.coordinates)[1]-10-53;
-            return eventpos[2*num+1];
+        .attr("y",function(d){
+			//return d.coordinates[1];
+			return projection(d.coordinates)[1];
         })
         .attr("width", 50)
         .attr("height", 100)
@@ -564,34 +387,69 @@ d3.json("json//Geo.json", function(error, root) {
         })
         .on("click",function(d)
         {
-            var str="http://localhost:63342/Sketch_Map/video/";
+            var str="video/";
             str+= d.number+".mp4";
             clicked(str, d.number);
         });
 
+	//绘制时间线
+    dataEventLine = root.TimeLine.geometries;
+	dataEventLine=updateDataEventLine(dataEventLine,dataEvent);
+	/* update ok 
+	for(var i=0;i<dataEventLine.length;i++)
+	{
+		//console.log("old dataEvent"+tmp[i].coordinates);
+		console.log("dataEventLine ..."+dataEventLine[i].coordinates);
+	}  */
+	/*for(var i=0;i<dataEventLine.length;i++)
+	{
+		console.log("x off is "+dataEventLine[i].coordinates[0]+" "+dataEvent[dataEventLine[i].s-1].coordinates);
+		console.log("y off is "+dataEventLine[i].coordinates[1]+" "+dataEvent[dataEventLine[i].e-1].coordinates);
+	}*/
+    g.selectAll("path.time")
+        .data(dataEventLine)
+        .enter()
+        .append("path")
+        .attr("stroke", "black")
+        .attr("stroke-width", function(d){
+            return d.len/2;
+        })
+        .attr("fill", "none")
+        .attr("class","time")
+        //.attr("d", path)
+        .attr("d",function(d){
+           return curvePath(d,projection);
+        })
+        .on("mousedown", function (d, i, e) {
+            d3.select(this)
+                .attr("display", "none")
+        })
+        .on("mouseout", function (d, i) {
+            d3.select(this)
+                .attr("display","block")
+        });
 
-
+	
     //绘制角色点
+	absEventPos=getAbsEventPos(dataEvent,projection);
     dataRoler = root.Points.geometries;
-    rolersPerEvent=getRolersNumPerEvent(dataRoler,dataEvent);
-    rolerPos=getRolerPos(dataRoler,rolersPerEvent,eventpos);
-
+    absEventRolerPos=getAbsEventRolerPos(dataRoler,absEventPos);
+   //absEventRolerPos=getRolerPos(dataRoler,rolersPerEvent,eventpos);
+	
+	
     g.selectAll("image.circle")
         .data(dataRoler)
         .enter()
         .append("svg:image")
         .attr("class", "circle")
         .attr("xlink:href", function(d){
-            return "SVG\\"+d.name+".svg"}
-    )
+            return "SVG/"+d.name+".svg"}
+		)
         .attr("x", function(d){
-            //console.log("x is ...");
-            //console.log(d.number+d.name);
-            return rolerPos[d.number-1][Nam(d.name)][0];
+            return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[0];
         })
         .attr("y",function(d){
-            return rolerPos[d.number-1][Nam(d.name)][1];
-            //return eventpos[2*d.number-1]+rolerPos[i][1]+25;
+            return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[1];
         })
         .attr("width", 50)
         .attr("height", 50)
@@ -603,12 +461,12 @@ d3.json("json//Geo.json", function(error, root) {
             d3.select(this)
                 .attr("x", function (d) {
 
-                    return rolerPos[d.number-1][Nam(d.name)][0]-15;
+                    return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[2];
                     //return projection(d.coordinates)[0] - 20;
                 })
                 .attr("y", function (d) {
                     //return this-20;
-                    return rolerPos[d.number-1][Nam(d.name)][1]-15;
+                    return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[3];
                 })
                 .attr("width", 80)
                 .attr("height", 80)
@@ -618,6 +476,61 @@ d3.json("json//Geo.json", function(error, root) {
 
             //console.log(d.name+d.number);
         });
+
+		
+	
+	//绘制角色联系线
+    //style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:30,30;stroke-dashoffset:0"
+	
+    oldDataRolerLine = root.LINES.geometries;
+	dataRolerLine=updateDataRolerLine(oldDataRolerLine,absEventRolerPos);
+    g.selectAll("path.spot")
+        .data(dataRolerLine)
+        .enter()
+        .append("path")
+        .attr("stroke", function(d){return color(Nam(d.name))})
+        .attr("stroke-width", 1)
+        .attr("fill", "none")
+        .attr("class","spot")
+		.attr("display","none")
+        .attr("border-style","double")
+        .attr("stroke-dasharray",3,3)
+        .attr("stroke-dashoffset",0)
+        .attr("d",function(d){
+			//console.log("dataRolerLine... "+d.coordinates+" s="+d.s+" e="+d.e+" name="+d.name);
+			var coor=new Array(4);
+			coor[0]=d.coordinates[0][0]+rolerOffset[0];
+			coor[1]=d.coordinates[0][1]+rolerOffset[1];
+			coor[2]=d.coordinates[1][0]+rolerOffset[0];
+			coor[3]=d.coordinates[1][1]+rolerOffset[1];
+			return "M"+coor[0]+","+coor[1]+"L"+coor[2]+","+coor[3];
+		});
+	/*
+	g.selectAll("line")
+		.data(absEventPos)
+		.enter()
+		.append("line")
+		.attr("x1",function(d){
+			return d[0];
+		})
+		.attr("y1",function(d)
+		{
+			return d[1];
+		})
+		.attr("x2",400)
+		.attr("y2",400)
+		.attr("stroke","red")
+		.attr("stroke-width",2);
+		*/
+	/* g.append("line").attr("x1",687+25).attr("y1",381+60)
+			.attr("x2",0).attr("y2",0)
+			.attr("stroke","red").attr("stroke-width",2);
+	g.append("line").attr("x1",890+25).attr("y1",376+60)
+			.attr("x2",100).attr("y2",0)
+			.attr("stroke","red").attr("stroke-width",2);
+	g.append("line").attr("x1",947+25).attr("y1",319+60)
+			.attr("x2",200).attr("y2",0)
+			.attr("stroke","red").attr("stroke-width",2); */
 });
 
 //放大缩小
@@ -709,22 +622,20 @@ function resets()
     cnt=0;
     g.selectAll("image.choose")
         .attr("class","circle");
+		
     g.selectAll("image.circle")
         .data(dataRoler)
-        /*.attr("class", "circle")
-         .attr("xlink:href", function(d){return "pic\\"+d.name+".png"})
-         .attr("x", function(d){return projection (d.coordinates)[0]-10})
-         .attr("y",function(d){return projection (d.coordinates)[1]-10})*/
+		.attr("width", 50)
+        .attr("height", 50)
         .attr("x", function(d,i){
-            return rolerPos[d.number-1][Nam(d.name)][0];
+            return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[0]-10;
         })
         .attr("y",function(d,i){
-            return rolerPos[d.number-1][Nam(d.name)][1];
-        })
-        .attr("width", 50)
-        .attr("height", 50);
+            return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[1];
+        });
+        
     g.selectAll("path.spot")
-        .data(dataLines)
+        .data(dataRolerLine)
         .attr("display","block")
         .attr("stroke", function(d){return color(Nam(d.name))});
 
