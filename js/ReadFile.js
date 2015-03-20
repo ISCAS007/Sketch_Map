@@ -335,11 +335,52 @@ d3.json("json//Geo.json", function(error, root) {
             }
         });
 
-    
-    //绘制事件点
-
-    var oldDataEvent = root.Event.geometries;
+	var oldDataEvent = root.Event.geometries;
 	dataEvent=updateDataEvent(oldDataEvent);
+	
+    //绘制事件线
+    dataEventLine = root.TimeLine.geometries;
+	dataEventLine=updateDataEventLine(dataEventLine,dataEvent);
+	/* update ok 
+	for(var i=0;i<dataEventLine.length;i++)
+	{
+		//console.log("old dataEvent"+tmp[i].coordinates);
+		console.log("dataEventLine ..."+dataEventLine[i].coordinates);
+	}  */
+	/*for(var i=0;i<dataEventLine.length;i++)
+	{
+		console.log("x off is "+dataEventLine[i].coordinates[0]+" "+dataEvent[dataEventLine[i].s-1].coordinates);
+		console.log("y off is "+dataEventLine[i].coordinates[1]+" "+dataEvent[dataEventLine[i].e-1].coordinates);
+	}*/
+    g.selectAll("path.time")
+        .data(dataEventLine)
+        .enter()
+        .append("path")
+        //.attr("stroke","black")
+		.attr("stroke",function(d){
+			//var ran=Math.floor(Math.random() * (10 + 1));
+			return color(d.e);
+		})
+        .attr("stroke-width", function(d){
+            return d.len/2+1;
+        })
+        .attr("fill", "none")
+        .attr("class","time")
+        //.attr("d", path)
+        .attr("d",function(d){
+           return curvePath(d,projection);
+        })
+        .on("mousedown", function (d, i, e) {
+            d3.select(this)
+                .attr("display", "none")
+        })
+        .on("mouseout", function (d, i) {
+            d3.select(this)
+                .attr("display","block")
+        });
+
+    //绘制事件点
+	
 	//update ok! 
 	/* for(var i=0;i<dataEvent.length;i++)
 	{
@@ -392,43 +433,7 @@ d3.json("json//Geo.json", function(error, root) {
             clicked(str, d.number);
         });
 
-	//绘制时间线
-    dataEventLine = root.TimeLine.geometries;
-	dataEventLine=updateDataEventLine(dataEventLine,dataEvent);
-	/* update ok 
-	for(var i=0;i<dataEventLine.length;i++)
-	{
-		//console.log("old dataEvent"+tmp[i].coordinates);
-		console.log("dataEventLine ..."+dataEventLine[i].coordinates);
-	}  */
-	/*for(var i=0;i<dataEventLine.length;i++)
-	{
-		console.log("x off is "+dataEventLine[i].coordinates[0]+" "+dataEvent[dataEventLine[i].s-1].coordinates);
-		console.log("y off is "+dataEventLine[i].coordinates[1]+" "+dataEvent[dataEventLine[i].e-1].coordinates);
-	}*/
-    g.selectAll("path.time")
-        .data(dataEventLine)
-        .enter()
-        .append("path")
-        .attr("stroke", "black")
-        .attr("stroke-width", function(d){
-            return d.len/2;
-        })
-        .attr("fill", "none")
-        .attr("class","time")
-        //.attr("d", path)
-        .attr("d",function(d){
-           return curvePath(d,projection);
-        })
-        .on("mousedown", function (d, i, e) {
-            d3.select(this)
-                .attr("display", "none")
-        })
-        .on("mouseout", function (d, i) {
-            d3.select(this)
-                .attr("display","block")
-        });
-
+	
 	
     //绘制角色点
 	absEventPos=getAbsEventPos(dataEvent,projection);
@@ -455,11 +460,11 @@ d3.json("json//Geo.json", function(error, root) {
             return "SVG/"+d.name+".svg"}
 		)
         .attr("x", function(d){
-			console.log("origin dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
+			//console.log("origin dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
             return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[0];
         })
         .attr("y",function(d){
-			console.log("origin dataRoler y..."+absEventRolerPos[d.number-1][Nam(d.name)][1]+" "+picOffset[1]);
+			//console.log("origin dataRoler y..."+absEventRolerPos[d.number-1][Nam(d.name)][1]+" "+picOffset[1]);
             return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[1];
         })
         .attr("width", 50)
@@ -596,11 +601,11 @@ function clicked(str,num) {
     if (player.style.visibility == "hidden") {
         player.style.visibility="visible";
         d3.selectAll("video").attr("src", str);
-        ppl.poster="http://localhost:63342/Sketch_Map/pic/"+ num+"-01.jpg";
+        ppl.poster="pic/"+ num+"-01.jpg";
     }
     else if(pp.src!=str) {
         pp.src = str;
-        ppl.poster = "http://localhost:63342/Sketch_Map/pic/" + num + "-01.jpg";
+        ppl.poster = "pic/" + num + "-01.jpg";
     }
     else {
         player.style.visibility = "hidden";
@@ -640,7 +645,7 @@ function resets()
 		.attr("width", 50)
         .attr("height", 50)
         .attr("x", function(d){
-			console.log("dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
+			//console.log("dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
             return absEventRolerPos_backup[((d.number-1)*eventnum+Nam(d.name))*2+0]+picOffset[0];
         })
         .attr("y",function(d){
@@ -688,6 +693,13 @@ function resets()
     classie.remove( menuLeft, 'cbp-spmenu-open' );
 	
 	d3.select("#scene-tooltip").attr("class","hidden");
+	
+	g.selectAll("path.background")
+        .data(dataMap)
+        .attr("stroke","white")
+        .attr("stroke-width",3);
+		
+	eventchoosenum=0;
 }
 
 

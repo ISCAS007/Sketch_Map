@@ -119,7 +119,7 @@ function updateDataEventLine(dataEventLine,dataEvent)
 	return newdata;
 }
 
-function curvePath(d,projection,number)
+function curvePath(d,projection)
 {
     var s=new Array(2);
 	var location=d.coordinates;
@@ -130,11 +130,46 @@ function curvePath(d,projection,number)
     var e=new Array(2);
     e[0]=location[1][0]*2/3+location[0][0]/3;
     e[1]=location[1][1]*2/3+location[0][1]/3;
-
-    s[0]=s[0]-0.5;
-    s[1]=s[1]-0;
-    e[1]=e[1]+0.5;
-    e[1]=e[1]+0;
+	
+	
+    
+	if(d.s==8&&d.e==9)
+	{
+		s[0]=s[0]+15;
+		s[1]=s[1]+0;
+		e[0]=e[0]+15;
+		e[1]=e[1]+0;
+	}
+	else if(d.s==9&&d.e==10)
+	{
+		s[0]=s[0]+10;
+		s[1]=s[1]+0;
+		e[0]=e[0]+10;
+		e[1]=e[1]+0;
+	}
+	else if(d.s==6&&d.e==11)
+	{
+		s[0]=s[0]+0;
+		s[1]=s[1]-30;
+		e[0]=e[0]+0;
+		e[1]=e[1]-30;
+	}
+	else if(d.s==12&&d.e==13)
+	{
+		s[0]=s[0]+0;
+		s[1]=s[1]-20;
+		e[0]=e[0]+0;
+		e[1]=e[1]-20;
+		//return "M"+projection(location[0])+" L"+projection(location[1])+" Z";
+	}
+	else
+	{
+		s[0]=s[0]+0;
+		s[1]=s[1]-0;
+		e[0]=e[0]-0;
+		e[1]=e[1]+0;
+	}
+	
 	/*
 	1. 23,45
 	2. 6,30
