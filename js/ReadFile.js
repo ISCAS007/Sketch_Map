@@ -13,7 +13,7 @@ var svg = d3.select("body").append("svg")
 var projection =  d3.geo.equirectangular()
 //var projection=d3.geo.mercator()
     .scale(153)
-    .translate([width / 2, height / 2])
+    .translate([width /2, height /2])
     .precision(.1);
 
 var path = d3.geo.path()
@@ -26,7 +26,7 @@ var color = d3.scale.category20();
 var displayrolers=[true,true,true,true,true,true,true,true,true,true,true,true,true,true];
 var g = svg.append("g");
 
-var scene2event=[0, 2,0,0,5,0,  0,14,0,0,0,  9,0,0,1,4,  3,6,11,7,8,  12,13,10,0];
+var scene2event=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
 var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#f8d4a2","#fbb4ae","#bad6d8","#d4d2d6","#c1ded2"];
 var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 var cnt=0;
@@ -45,6 +45,9 @@ var eventchoosenum=0;
 
 svg.append("rect")
     .attr("class", "overlay")
+	//.attr("fill","#0000ff")
+	//.attr("stoke","black")
+	//.attr("display","block")
     .attr("width", width)
     .attr("height", height);
 svg.call(zoom)
@@ -411,16 +414,19 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("height", 100)
         //.translate([-61.695,-106.195])
         .on("mouseover",function(d){
+			//var xPosition=projection(d.coordinates)[0]+50;
+			//var yPosition=projection(d.coordinates)[1]-50;
             var xPosition=parseFloat(d3.event.x);
             var yPosition=parseFloat(d3.event.y);
-
+			//var con=d3.select("#container");
+			console.log("parse x y "+xPosition+" "+yPosition);
             d3.select("#tooltip")
                 .classed("hidden",false)
                 .style("left",xPosition+"px")
                 .style("top",yPosition+"px")
                 .select("#value")
 
-                .text("我是剧情简介，针对不同的事件显示不同的内容");
+                .text("我是剧情简介，针对不同的事件显示不同的内容: 这是事件 "+d.number);
         })
         .on("mouseout",function(d){
             d3.select("#tooltip")
@@ -428,6 +434,12 @@ d3.json("json//Geo.json", function(error, root) {
         })
         .on("click",function(d)
         {
+			var x=projection(d.coordinates)[0];
+			var y=projection(d.coordinates)[1];
+			d3.select("#player")
+				.style("left",x+"px")
+				.style("top",y+"px");
+			
             var str="video/";
             str+= d.number+".mp4";
             clicked(str, d.number);
