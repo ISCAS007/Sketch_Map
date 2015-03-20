@@ -41,6 +41,8 @@ var picOffset=[-25,-30,-50,-55];
 var eventchoose=new Array(2);
 var eventchoosenum=0;
 
+var rolerLineColorSet=["green","blue","purple"];	//查询路径时，返回路径的颜色集合
+var pos=[width/3,0];	//显示块的信息时，返回的位置
 
 
 svg.append("rect")
@@ -248,8 +250,8 @@ function showSceneTooltip(SceneNumber,pos,str)
     //x=document.documentElement.scrollLeft;//+event.clientX;
     //y=document.documentElement.scrollTop;//+event.clientY;
     //console.log("x is "+x+" y is "+y);
-    var x=pos[0]+10;
-    var y=pos[0]+10;
+    var x=pos[0];
+    var y=pos[1];
     var tooltip=d3.select("#scene-tooltip");
     //tooltip.select("#scene-number").text(SceneNumber[0]+","+SceneNumber[1]);
     tooltip.select("#scene-people").text(str);
@@ -314,7 +316,7 @@ d3.json("json//Geo.json", function(error, root) {
                         .attr("stroke-width",10);
 
                     //pos=mousePos(e);
-                    pos=[400,400];
+                    
                     var SceneNumber=[scene2event[eventchoose[0]],scene2event[eventchoose[1]]];
                     var CommonRolers=getCommonRolers(SceneNumber,dataRoler,14,Nam,num2roler);
                     showSceneTooltip(SceneNumber,pos,CommonRolers);

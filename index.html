@@ -176,6 +176,8 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 				g.selectAll("path.timeMan")
 					.data(timeManLineArray[1])
 					.attr("stroke",function(d){
+						return rolerLineColorSet[d-1];
+						/*
 						if(d==1){
 							return color(Nam(Na[0]));
 						}
@@ -187,6 +189,10 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 							return color(19);	//最后一种颜色
 							//return "red";
 						}
+						*/
+					})
+					.attr("stroke-width",function(d){
+						return d;
 					})
 					.attr("display","block");
 					
