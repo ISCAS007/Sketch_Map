@@ -32,7 +32,7 @@ var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 var cnt=0;
 var dataMap,dataEvent,dataRoler;	//from json
 var dataEventLine,dataRolerLine;
-var absEventRolerPos;
+var absEventRolerPos,absEventRolerPos_backup;
 var absEventPos;
 var rolerOffset=[-10,0];
 var picOffset=[-25,-30,-50,-55];
@@ -436,6 +436,15 @@ d3.json("json//Geo.json", function(error, root) {
     absEventRolerPos=getAbsEventRolerPos(dataRoler,absEventPos);
    //absEventRolerPos=getRolerPos(dataRoler,rolersPerEvent,eventpos);
 	
+	absEventRolerPos_backup=[];
+	for(var i=0;i<absEventRolerPos.length;i++)
+	{
+		for(var j=0;j<absEventRolerPos[i].length;j++)
+		{
+			absEventRolerPos_backup.push(absEventRolerPos[i][j][0]);
+			absEventRolerPos_backup.push(absEventRolerPos[i][j][1]);
+		}
+	}
 	
     g.selectAll("image.circle")
         .data(dataRoler)
@@ -446,9 +455,11 @@ d3.json("json//Geo.json", function(error, root) {
             return "SVG/"+d.name+".svg"}
 		)
         .attr("x", function(d){
+			console.log("origin dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
             return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[0];
         })
         .attr("y",function(d){
+			console.log("origin dataRoler y..."+absEventRolerPos[d.number-1][Nam(d.name)][1]+" "+picOffset[1]);
             return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[1];
         })
         .attr("width", 50)
@@ -480,11 +491,11 @@ d3.json("json//Geo.json", function(error, root) {
 		
 	
 	//绘制角色联系线
-    //style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:30,30;stroke-dashoffset:0"
 	
     oldDataRolerLine = root.LINES.geometries;
 	dataRolerLine=updateDataRolerLine(oldDataRolerLine,absEventRolerPos);
-    g.selectAll("path.spot")
+    /*	//始终不显示角色联系线
+	g.selectAll("path.spot")
         .data(dataRolerLine)
         .enter()
         .append("path")
@@ -505,6 +516,7 @@ d3.json("json//Geo.json", function(error, root) {
 			coor[3]=d.coordinates[1][1]+rolerOffset[1];
 			return "M"+coor[0]+","+coor[1]+"L"+coor[2]+","+coor[3];
 		});
+		*/
 	/*
 	g.selectAll("line")
 		.data(absEventPos)
@@ -627,18 +639,20 @@ function resets()
         .data(dataRoler)
 		.attr("width", 50)
         .attr("height", 50)
-        .attr("x", function(d,i){
-            return absEventRolerPos[d.number-1][Nam(d.name)][0]+picOffset[0]-10;
+        .attr("x", function(d){
+			console.log("dataRoler x..."+absEventRolerPos[d.number-1][Nam(d.name)][0]+" "+picOffset[0]);
+            return absEventRolerPos_backup[((d.number-1)*eventnum+Nam(d.name))*2+0]+picOffset[0];
         })
-        .attr("y",function(d,i){
-            return absEventRolerPos[d.number-1][Nam(d.name)][1]+picOffset[1];
+        .attr("y",function(d){
+			//console.log("dataRoler y..."+absEventRolerPos[d.number-1][Nam(d.name)][1]+" "+picOffset[1]);
+            return absEventRolerPos_backup[((d.number-1)*eventnum+Nam(d.name))*2+1]+picOffset[1];
         });
-        
+    /*    
     g.selectAll("path.spot")
         .data(dataRolerLine)
         .attr("display","block")
         .attr("stroke", function(d){return color(Nam(d.name))});
-
+	*/
     g.selectAll("path.timeMan").remove();
 
     displayrolers=[true,true,true,true,true,true,true,true,true,true,true,true,true,true];
@@ -662,6 +676,18 @@ function resets()
             });
         //g.selectAll("image.choose").attr("display", "block");
     }
+	
+	var player=document.getElementById("player");
+	player.style.visibility = "hidden";
+	
+	//classie.toggle( this, 'active' );
+	var     menuLeft = document.getElementById( 'cbp-spmenu-s2' ),
+			body = document.body;
+    //classie.toggle( body, 'cbp-spmenu-push-toleft' );
+	//console.log(window.classie);
+    classie.remove( menuLeft, 'cbp-spmenu-open' );
+	
+	d3.select("#scene-tooltip").attr("class","hidden");
 }
 
 

@@ -92,10 +92,10 @@ function getAbsEventPos(dataEvent,projection)
 		
 		newdata.push(set);
 	}
-	for(var i=0;i<dataEvent.length;i++)
+	/* for(var i=0;i<dataEvent.length;i++)
 	{
 		console.log("absEventPos   "+newdata[i]);
-	}
+	} */
 	return newdata;
 }
 function updateDataEventLine(dataEventLine,dataEvent)

@@ -44,7 +44,6 @@
     </style>
 </head>
 <body>
-<p id="output"></p>
 <!--查询界面-->
 <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2"></nav>
 
@@ -115,21 +114,9 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 <!--各种功能函数-->
 <script src="js/yzbx.js"></script>
 <script>
-	//<line x1="0" y1="0" x2="300" y2="300" style="stroke:rgb(99,99,99);stroke-width:2"/>
-			
-	//d3.select("#output").text(outputstr);
     var     menuLeft = document.getElementById( 'cbp-spmenu-s2' ),
-            //showLeftPush = document.getElementById( 'OK' ),
             body = document.body;
-    /*
-	showLeftPush.onclick = function() {
-        classie.toggle( this, 'active' );
-		
-        classie.toggle( body, 'cbp-spmenu-push-toleft' );
-        classie.toggle( menuLeft, 'cbp-spmenu-open' );
-		//create_button(3);
-    };
-	*/
+			
     var shows=function(){
         setvalue();
         g.selectAll("image.circle").attr("display", function (d) {
@@ -139,14 +126,6 @@ Common Rolers: <span id="scene-people">neo</span> </td>
             var result=checkdis(d);
             return result;});
     };
-    /*(function() {
-        var dlgtrigger = document.querySelector( '[data-dialog]' ),
-                somedialog = document.getElementById( dlgtrigger.getAttribute( 'data-dialog' ) ),
-                dlg = new DialogFx( somedialog );
-        dlgtrigger.addEventListener( 'click', dlg.toggle.bind(dlg) );
-
-    })();
-	*/
 	
 	var find=function(){
 		console.log("show the path .................................");
@@ -172,10 +151,7 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 				{
 					console.log(d[i]);
 				}
-				//var timevalue=getTimeLineValue(dataLine,d);
-				//console.log("time value is "+timevalue);
-				//dataRoler 事件角色点的集合
-				//timeManValueArray={from,to,rolerNum}
+			
 				var timeManLineArray=getTimeManValueArray(absEventRolerPos,d,Na);
 				//console.log("timeManValueArray is "+timeManValueArray);
 				console.log("Na is "+Na);
@@ -217,17 +193,6 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 				//createAPath(g,[[433,347],[347,433],[522,335],[600,400],[400,600]]);
 			});
 			
-			
-			/*
-			var dlgtrigger = document.querySelector( '[data-dialog]' ),
-                somedialog = document.getElementById( dlgtrigger.getAttribute( 'data-dialog' ) ),
-                dlg = new DialogFx( somedialog );
-			dlgtrigger.addEventListener( 'click', dlg.toggle.bind(dlg) );
-			*/
-			
-			//classie.toggle( this, 'active' );
-			
-			classie.toggle( document.body, 'cbp-spmenu-push-toleft' );
 			classie.toggle( menuLeft, 'cbp-spmenu-open' );
 		}
 		else{
@@ -248,9 +213,6 @@ Common Rolers: <span id="scene-people">neo</span> </td>
         document.getElementById("cbp-spmenu-s2").innerHTML=str;
         var shutdo = document.getElementById( 'close' );
         shutdo.onclick = function() {
-
-            classie.toggle( this, 'active' );
-            classie.toggle( body, 'cbp-spmenu-push-toleft' );
             classie.toggle( menuLeft, 'cbp-spmenu-open' );
         };
     }
