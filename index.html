@@ -120,9 +120,11 @@ Common Rolers: <span id="scene-people">neo</span> </td>
     var shows=function(){
         setvalue();
         g.selectAll("image.circle").attr("display", function (d) {
+			console.log("show image.circle d........."+d.number+d.name);
             var result=checkdis(d);
         return result;});
         g.selectAll("path.spot").attr("display",function(d){
+			console.log("show path.spot d........."+d.number+" "+d.name+" "+d.s+" "+d.e);
             var result=checkdis(d);
             return result;});
     };

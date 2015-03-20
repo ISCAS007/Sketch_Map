@@ -513,7 +513,7 @@ d3.json("json//Geo.json", function(error, root) {
 	
     oldDataRolerLine = root.LINES.geometries;
 	dataRolerLine=updateDataRolerLine(oldDataRolerLine,absEventRolerPos);
-    /*	//始终不显示角色联系线
+    	//始终不显示角色联系线
 	g.selectAll("path.spot")
         .data(dataRolerLine)
         .enter()
@@ -535,7 +535,7 @@ d3.json("json//Geo.json", function(error, root) {
 			coor[3]=d.coordinates[1][1]+rolerOffset[1];
 			return "M"+coor[0]+","+coor[1]+"L"+coor[2]+","+coor[3];
 		});
-		*/
+		
 	/*
 	g.selectAll("line")
 		.data(absEventPos)
@@ -640,11 +640,8 @@ function setvalue()
 function checkdis(d) {
     if (displayrolers[Nam(d.name)])
         return "block";
-
     else
-
         return "none";
-
 }
 function resets()
 {
@@ -666,6 +663,7 @@ function resets()
 			//console.log("dataRoler y..."+absEventRolerPos[d.number-1][Nam(d.name)][1]+" "+picOffset[1]);
             return absEventRolerPos_backup[((d.number-1)*eventnum+Nam(d.name))*2+1]+picOffset[1];
         });
+	g.selectAll("path.spot").attr("display","none");
     /*    
     g.selectAll("path.spot")
         .data(dataRolerLine)
