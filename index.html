@@ -95,7 +95,7 @@ Common Rolers: <span id="scene-people">neo</span> </td>
     </div>
 </div>
 <!--播放器 left:800;top:400-->
-<div id="player" class="show" style="position:absolute; opacity:1;visibility:hidden;width: 640px; height: 264px;">
+<div id="player" class="show" style="position:absolute; opacity:1;visibility:hidden;width: 320px; height: 264px;">
     <video id="pp" poster="pic/1-01.jpg"  controls="controls" src="video/1.mp4" type="video/mp4" />
 </div>
 <div ><button data-dialog="somedialog" class="trigger" id="showLeftPush" style= "position:absolute;right:200;top:200;" onclick="find()">查询</button></div>
@@ -160,6 +160,7 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 				g.selectAll("path.timeMan").remove();
 				
 				//createAbsLine(g,timeManLineArray);
+				var findRolerLineOff=[-5,-1];
 				g.selectAll("path.timeMan")
 					.data(timeManLineArray[0])
 					.enter()
@@ -169,10 +170,15 @@ Common Rolers: <span id="scene-people">neo</span> </td>
 					.attr("fill", "none")
 					//.attr("d", path);
 					.attr("d",function(d){
-						console.log("")
-						var att="M"+d.coordinates[0][0]+" "+d.coordinates[0][1]
-									+"L"+d.coordinates[1][0]+" "+d.coordinates[1][1]+" Z";
-						return att;
+						//console.log("")
+						var from=new Array(2);
+						var to=new Array(2);
+						from[0]=d.coordinates[0][0]+findRolerLineOff[0];
+						from[1]=d.coordinates[0][1]+findRolerLineOff[1];
+						to[0]=d.coordinates[1][0]+findRolerLineOff[0];
+						to[1]=d.coordinates[1][1]+findRolerLineOff[1];
+						return  "M"+from+" L"+to+" Z";
+					
 					});
 					
 				g.selectAll("path.timeMan")

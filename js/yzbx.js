@@ -307,7 +307,7 @@ return 3 表示显示并令其颜色为混合颜色
 function getInvertLocation(from,to)
 {
 	var location=[];
-	var xoff=-10,yoff=0;
+	var xoff=0,yoff=0;
 	location.push([from[0]+xoff,from[1]+yoff]);
 	location.push([to[0]+xoff,to[1]+yoff]);
 	

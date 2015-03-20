@@ -81,8 +81,8 @@ function getAbsEventPos(dataEvent,projection)
 		set=new Array(2);
 		if(i==1)
 		{
-			set[0]=projection(dataEvent[i].coordinates)[0]+10;
-			set[1]=projection(dataEvent[i].coordinates)[1]+40;
+			set[0]=projection(dataEvent[i].coordinates)[0]+25;
+			set[1]=projection(dataEvent[i].coordinates)[1]+60;
 		}
 		else
 		{	
@@ -176,38 +176,20 @@ function curvePath(d,projection)
 	*/
 	
 	var from,to;
-	var x,y;
+	//eventLineOff=[x,y];
+	var x=21,y=60;
 	from=projection(location[0]);
 	to=projection(location[1]);
 	
-	
-	if(d.s==2){
-		x=8;
-		y=40;
-	}
-	else{
-		x=25;
-		y=60;
-	}
-	
 	from[0]=from[0]+x;
 	from[1]=from[1]+y;
-	
-	if(d.e==2){
-		x=8;
-		y=40;
-	}
-	else{
-		x=25;
-		y=60;
-	}
-	
+
 	to[0]=to[0]+x;
 	to[1]=to[1]+y;
 	
-    var str="M"+from+" C"+projection(s)+" "+projection(e)+" "+to;
+    //var str="M"+from+" C"+projection(s)+" "+projection(e)+" "+to;
 	//var str="M"+location[0]+" L"+location[1];
-	//var str="M"+from+" L"+to;
+	var str="M"+from+" L"+to;
     //console.log("curve ..."+str);
     //svg_path.attr("d","M"+location[0]+" C"+s+" "+e+" "+location[1]);
     return str;
