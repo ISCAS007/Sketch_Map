@@ -478,3 +478,18 @@ function getRolerLocation(rolerpos)
 	
 	return rolerlocation;
 }
+/* failed!!!!
+function showCanvas()
+{
+	var map=d3.select("svg");
+	if(map.attr("display")=="none"){
+		map.attr("display","block");
+	}
+	else
+	{
+		map.attr("display","none");
+	}
+	console.log(map.attr("display"));
+	//d3.select("svg").attr("display","none");
+}
+*/
