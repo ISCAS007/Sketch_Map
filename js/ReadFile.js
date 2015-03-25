@@ -26,9 +26,7 @@ var color = d3.scale.category20();
 var displayrolers=[true,true,true,true,true,true,true,true,true,true,true,true,true,true];
 var g = svg.append("g");
 
-var scene2event=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
 var backgroundColorSet=["#fbb4ae","#f0d3c2","#e2cddd","#c8e7c2","#f8d4a2","#f0d3c2","#f8d4a2","#fbb4ae","#e2cddd","#f8d4a2","#fbb4ae","#bad6d8","#d4d2d6","#c1ded2"];
-var reflection=[0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 var cnt=0;
 var dataMap,dataEvent,dataRoler;	//from json
 var dataEventLine,dataRolerLine;
@@ -44,6 +42,7 @@ var eventchoosenum=0;
 
 var rolerLineColorSet=["green","blue","purple"];	//查询路径时，返回路径的颜色集合
 var pos=[width/3,0];	//显示块的信息时，返回的位置
+var stopDrag=false;
 
 
 svg.append("rect")
@@ -103,84 +102,6 @@ function reverseEventPath(pathrecord,x,s)
     else{
         return [];
     }
-}
-function djstlEventPath(evetnchoose,eventline,scene2event)
-{
-    var s=scene2event[eventchoose[0]];
-    var e=scene2event[eventchoose[1]];
-
-    var adjmat=getEventAdjMatrix(eventline,15);
-
-    var distance=new Array(15)
-    var flag=new Array(15);
-    var record=new Array(15);
-    var minNum=s;
-    for(var i=0;i<15;i++)
-    {
-        distance[i]=-1;
-        flag[i]=0;
-    }
-    distance[s]=0;
-    flag[s]=1;
-
-    var min;
-    while(minNum!=e)
-    {
-        console.log("minNum flag distance ");
-        console.log(minNum);
-        console.log(flag);
-        console.log(distance);
-        for(var i=minNum+1;i<15;i++)
-        {
-            //console.log("adjmat.length "+adjmat.length);
-            if(adjmat[minNum][i]!=0&&distance[minNum]!=-1&&flag[i]==0)
-            {
-                if(distance[i]==-1||distance[minNum]+adjmat[minNum][i]<distance[i])
-                {
-                    distance[i]=distance[minNum]+adjmat[minNum][i];
-                    record[i]=minNum;
-                }
-            }
-        }
-        flag[minNum]=1;
-
-        min=-1;
-        for(var i=1;i<15;i++)
-        {
-            if(flag[i]==0&&distance[i]!=-1&&(distance[i]<min||min==-1))
-            {
-                min=distance[i];
-                minNum=i;
-            }
-        }
-
-        if(min==-1) return [];
-    }
-
-    djstleventpath=reverseEventPath(record,e,s);
-    //
-    return djstleventpath;
-}
-
-function showEventPath(eventchoose,eventline,scene2event){
-    var djstleventpath=djstlEventPath(eventchoose,eventline,scene2event);
-    var showFlag=new Array(eventline.length);
-    var s=scene2event[eventchoose[0]];
-    var e=scene2event[eventchoose[1]];
-    for(var i=0;i<eventline.length;i++)
-    {
-        showFlag[i]=0;
-        for(var j=0;j<djstleventpath.length;j++)
-        {
-            if(eventline[i].s==djstleventpath[j][0]&&eventline[i].e==djstleventpath[j][1]) showFlag[i]=1;
-        }
-    }
-    g.selectAll("path.time")
-        .data(showFlag)
-        .attr("display",function(d){
-            if(d==1)	return "block";
-            else return "none"
-        })
 }
 
 function mousePos(e){
@@ -278,12 +199,12 @@ d3.json("json//Geo.json", function(error, root) {
         })
         .attr("stroke-width",3)
         .attr("class","background")
-        .attr("id",function(d,i){
-            return "path-background"+i;
+        .attr("id",function(d){
+            return "path-background"+d.number;
         })
         .attr("fill", function(d){
             //return color(i);
-            return backgroundColorSet[reflection[d.number-1]];
+            return backgroundColorSet[d.number-1];
         })
         .attr("opacity",1)
         .attr("full-opacity",1)
@@ -292,16 +213,16 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("stroke-dasharray",0.986192,0.591715,0.197238,0.591715)
         .attr("d", path )
         .on("click",function(d,i){
-
+			//console.log("map i is "+i+" number is "+d.number);
             if(eventchoosenum==0){
-                eventchoose[0]=i;
+                eventchoose[0]=d.number;
                 eventchoosenum=1;
-                g.selectAll("#path-background"+i)
+                g.selectAll("#path-background"+d.number)
                     .attr("stroke","red")
                     .attr("stroke-width",10);
             }
             else if(eventchoosenum==1) {
-                if(eventchoose[0]==i)
+                if(eventchoose[0]==d.number)
                 {
                     eventchoosenum=0;
                     g.selectAll("#path-background"+eventchoose[0])
@@ -309,18 +230,16 @@ d3.json("json//Geo.json", function(error, root) {
                         .attr("stroke-width",1);
                 }
                 else{
-                    eventchoose[1]=i;
+                    eventchoose[1]=d.number;
                     eventchoosenum=2;
-                    console.log("eventchoose is "+eventchoose+" number is "+scene2event[eventchoose[0]]+" "+scene2event[eventchoose[1]]);
-                    g.selectAll("#path-background"+i)
+        
+                    g.selectAll("#path-background"+d.number)
                         .attr("stroke","red")
                         .attr("stroke-width",10);
 
-                    //pos=mousePos(e);
-                    
-                    var SceneNumber=[scene2event[eventchoose[0]],scene2event[eventchoose[1]]];
-                    var CommonRolers=getCommonRolers(SceneNumber,dataRoler,14,Nam,num2roler);
-                    showSceneTooltip(SceneNumber,pos,CommonRolers);
+                 
+                    var CommonRolers=getCommonRolers(eventchoose,dataRoler,14,Nam,num2roler);
+                    showSceneTooltip(eventchoose,pos,CommonRolers);
                 }
             }
             else if(eventchoosenum==2){
@@ -331,8 +250,6 @@ d3.json("json//Geo.json", function(error, root) {
                     .attr("stroke","white")
                     .attr("stroke-width",1);
 
-                //showEventPath(eventchoose,dataLine,scene2event)
-                //showEventPath(eventchoose);
                 eventchoosenum=0;
             }
 
@@ -425,7 +342,7 @@ d3.json("json//Geo.json", function(error, root) {
             var xPosition=parseFloat(d3.event.x);
             var yPosition=parseFloat(d3.event.y);
 			//var con=d3.select("#container");
-			console.log("parse x y "+xPosition+" "+yPosition);
+			//console.log("parse x y "+xPosition+" "+yPosition);
             d3.select("#tooltip")
                 .classed("hidden",false)
                 .style("left",xPosition+"px")
@@ -438,7 +355,7 @@ d3.json("json//Geo.json", function(error, root) {
             d3.select("#tooltip")
                 .classed("hidden",true)
         })
-        .on("click",function(d)
+        .on("click",function(d,i)
         {
 			//var x=projection(d.coordinates)[0];
 			//var y=projection(d.coordinates)[1];
@@ -506,6 +423,11 @@ d3.json("json//Geo.json", function(error, root) {
                 .attr("height",32.6/2)
                 //.attr("stroke","red")
                 .attr("class", "choose");
+			if(cnt==1&&Nu[0]==Nu[1]&&Na[0]==Na[1])
+			{
+				console.log("find the same point ");
+				cnt=cnt-1;
+			}
             cnt = cnt + 1;
 
             //console.log(d.name+d.number);
@@ -576,6 +498,7 @@ function zoomSize(size,scale)
     else return size;
 }
 function zoomed() {
+	//console.log("translate "+zoom.translate());
     g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
     if(zoom.scale()<2)
         g.selectAll("path.time").attr("display","block");

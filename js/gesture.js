@@ -41,10 +41,13 @@ function mouseDownEvent(x, y)
 	_points[0] = new Point(x, y);
 	drawText("Recording unistroke...");
 }
-function mouseMoveEvent(x, y)
+function mouseMoveEvent(x, y,event)
 {
 	if (_isDown)
 	{
+		if(stopDrag)	event.stopPropagation();	//停止其它事件，如拖动
+		else return;
+		//console.log("stop listen...");
 		x -= _rc.x;
 		y -= _rc.y - getScrollY();
 		//console.log("get a point "+x+","+y);
@@ -64,8 +67,20 @@ function mouseUpEvent(x, y)
 		if (_points.length >= 10)
 		{
 			//var result = _r.Recognize(_points,document.getElementById('useProtractor').checked);
+			var from,to;
+			var translate=zoom.translate();
+			var scale=zoom.scale();
+			from=new Point((_points[0].X-translate[0])/scale,(_points[0].Y-translate[1])/scale);
+			to=new Point((_points[_points.length-1].X-translate[0])/scale,(_points[_points.length-1].Y-translate[1])/scale);
+			var center=Centroid(_points);
+			console.log("center is "+center.X+","+center.Y);
+			center.X=(center.X-translate[0])/scale;
+			center.Y=(center.Y-translate[1])/scale;
+			console.log(from.X+","+to.X+","+center.X);
+			
 			var result = _r.Recognize(_points,false);
 			drawText("Result: " + result.Name + " (" + round(result.Score,2) + ").");
+			result2action(result,from,to,center);
 		}
 		else // fewer than 10 points were inputted
 		{

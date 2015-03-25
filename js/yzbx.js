@@ -69,9 +69,9 @@ timeManPathArray: 时间人物路径数组
 function getTimeLinePath(Nu,Na,timeManEdgeArray,pointNum,Points)
 {
 	var m=Nu[1]-Nu[0]+1;
-	if(m<2){
+	if(m<2){	
 		console.log("请确保调用前满足 Nu[1]>Nu[0]");
-		return;
+		return ;
 	}
 	
 	var edgeMatrix=new Array();		//the edge for dfs, [src,des,length]
@@ -495,6 +495,17 @@ function showCanvas()
 */
 function gestureHelp()
 {
+	if(stopDrag) {
+		stopDrag=false;
+		d3.select("#gesture_pic").attr("class","hidden");
+		d3.select("#button_gesture").text("拖动");
+	}
+	else {
+		stopDrag=true;
+		d3.select("#gesture_pic").attr("class","show");//.text("手势优先");
+		d3.select("#button_gesture").text("手势");
+	}
+	/*
 	if(d3.select("#gesture_pic").attr("class")=="hidden")
 	{
 		d3.select("#gesture_pic").attr("class","show");
@@ -502,5 +513,183 @@ function gestureHelp()
 	else
 	{
 		d3.select("#gesture_pic").attr("class","hidden");
+	}
+	
+	for(var i=0;i<_r.Unistrokes.length;i++)
+	{
+		console.log(_r.Unistrokes[i].Name);
+	}
+	*/
+}
+
+function result2action(result,from,to,center)
+{
+	console.log(result.Name);
+	switch(result.Name){
+	case "triangle":
+	{
+		//shows();
+		//break;
+	}
+	case "rectangle":
+	{
+	/*
+		var player=document.getElementById("player");
+		if (player.style.visibility == "hidden") {
+			player.style.visibility="visible";
+		}
+		else{
+			player.style.visibility="hidden";
+		}
+		break;
+		*/
+	}
+	case "circle":
+	{
+		//resets();
+		var index=0;
+		var min=+Infinity;
+		for(var i=0;i<absEventPos.length;i++)
+		{	
+			var p=new Point(absEventPos[i][0],absEventPos[i][1]);
+			var dis=Distance(p,center);
+			if(dis<min)
+			{
+				min=dis;
+				index=i;
+			}
+		}
+		var num=index+1;
+		var str="video/";
+            str+= num+".mp4";
+            clicked(str, num);
+		
+		console.log("choose event center "+index);
+		break;
+	}
+	case "x":
+	{
+		//gestureHelp();
+		//break;
+	}
+	case "check":{
+		//find();
+		//break;
+	}
+	case "caret":
+	case "zig-zag":
+	case "arrow":
+	case "left square bracket":
+	case "right square bracket":
+	case "v":
+	case "delete":
+	case "left curly brace":
+	case "right curly brace":
+	case "star":
+	case "pigtail":
+	{
+		var index=0;
+		var min=+Infinity;
+		
+		if(d3.select("image.circle").attr("display")=="none"){
+			console.log("display==none");
+			for(var i=0;i<absEventPos.length;i++)
+			{	
+				var p=new Point(absEventPos[i][0],absEventPos[i][1]);
+				var dis=Distance(p,from);
+				if(dis<min)
+				{
+					min=dis;
+					index=i;
+				}
+			}
+			eventchoose[0]=index+1;
+			console.log("choose event from "+index);
+			
+			min=+Infinity;
+			for(var i=0;i<absEventPos.length;i++)
+			{	
+				var p=new Point(absEventPos[i][0],absEventPos[i][1]);
+				var dis=Distance(p,to);
+				if(dis<min)
+				{
+					min=dis;
+					index=i;
+				}
+			}
+			
+			console.log("choose event to "+index);
+			
+			eventchoose[1]=index+1;
+			eventchoosenum=2;
+			g.selectAll("#path-background"+eventchoose[0])
+						.attr("stroke","red")
+						.attr("stroke-width",10);
+			g.selectAll("#path-background"+eventchoose[1])
+						.attr("stroke","red")
+						.attr("stroke-width",10);
+	
+			var CommonRolers=getCommonRolers(eventchoose,dataRoler,14,Nam,num2roler);
+				
+			showSceneTooltip(eventchoose,pos,CommonRolers);
+		}
+		else
+		{
+			console.log("display==block");
+			min=+Infinity;
+			var eventIndex=0;
+			var rolerIndex=0;
+			var p_from;
+			for(var i=0;i<absEventRolerPos.length;i++)
+			{
+				for(var j=0;j<absEventRolerPos[0].length;j++)
+				{
+					var p=new Point(absEventRolerPos[i][j][0]+picOffset[0],absEventRolerPos[i][j][1]+picOffset[1]);
+					var dis=Distance(p,from);
+					if(dis<min)
+					{
+						p_from=p;
+						min=dis;
+						eventIndex=i;
+						rolerIndex=j;
+					}
+				}
+			}
+			
+			Na[0]=num2roler(rolerIndex);
+			Nu[0]=eventIndex+1;
+			
+			min=+Infinity;
+			var p_to;
+			for(var i=0;i<absEventRolerPos.length;i++)
+			{
+				for(var j=0;j<absEventRolerPos[0].length;j++)
+				{
+					var p=new Point(absEventRolerPos[i][j][0]+picOffset[0],absEventRolerPos[i][j][1]+picOffset[1]);
+					var dis=Distance(p,to);
+					if(dis<min)
+					{
+						p_to=p;
+						min=dis;
+						eventIndex=i;
+						rolerIndex=j;
+					}
+				}
+			}
+			
+			cnt=2;
+			Na[1]=num2roler(rolerIndex);
+			Nu[1]=eventIndex+1;
+			console.log("from is "+from.X+","+from.Y+" to is "+to.X+","+to.Y);
+			console.log("absEventRolerPos is from "+p_from.X+","+p_from.Y+" to "+p_to.X+","+p_to.Y);
+			console.log("Na is "+Na+" Nu is "+Nu);
+			find();
+		}
+		
+		
+		break;
+	}
+	default:
+		return;
 	}
 }

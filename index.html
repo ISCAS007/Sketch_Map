@@ -53,7 +53,7 @@
 	<script src="js/yzbx.js"></script>
 </head>
 <body onload="onLoadEvent()" onmousedown="mouseDownEvent(event.clientX, event.clientY)"
-					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
+					onmousemove="mouseMoveEvent(event.clientX, event.clientY,event)"
 					onmouseup="mouseUpEvent(event.clientX, event.clientY)">
 <!--草图界面-->
 <!--
@@ -153,7 +153,7 @@
 <div ><button data-dialog="somedialog" class="trigger" id="showLeftPush" style= "position:absolute;right:200;top:200;" onclick="find()">查询</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="showSpecial" style= "position:absolute;right:200;top:300;" onclick="shows()">展示</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="reset" style= "position:absolute;right:200;top:400;" onclick="resets()">重置</button></div>
-<div ><button data-dialog="somedialog" class="trigger" id="gesture" style= "position:absolute;right:200;top:500;" onclick="gestureHelp()">手势</button></div>
+<div ><button data-dialog="somedialog" class="trigger" id="button_gesture" style= "position:absolute;right:200;top:500;" onclick="gestureHelp()">拖动</button></div>
 
 <!--事件提示-->
 <div id="tooltip" class="hidden hidden">
@@ -188,44 +188,22 @@
 	
 	var find=function(){
 		console.log("show the path .................................");
+		
+		g.selectAll("path.timeMan").remove();
+		var findRolerLineOff=[-15,-1];
 		//显示路径数目并创建相应的按钮
 		if(cnt==2){
-			if(Nu[0]<Nu[1])
+			if(Nu[0]==Nu[1])
 			{
-				var tmp=Nu[0];
-				Nu[0]=Nu[1];
-				Nu[1]=tmp;
-				tmp=Na[0];
-				Na[0]=Na[1];
-				Na[1]=tmp;
-			}
-			var pointNum=dataEvent.length;
-			var timeManPathArray=getTimeLinePath(Nu,Na,dataRolerLine,pointNum,dataRoler);
-			
-			create_button(timeManPathArray.length);
-			//d3.select("div.dialog-inner").select("h2").text("共有"+timeManPathArray.length+"条路径");
-			//classie.toggle( this, 'active' );
-			
-			//显示路径
-			d3.selectAll("button.path")
-			.data(timeManPathArray)
-			.on("click",function(d){
-				//d 为某条时间线路径
-				//g.selectAll("path.time").attr("display","none");
-				g.selectAll("path.spot").attr("display","none");
-				
-				console.log("显示路径 d is "+d);
-				for (var i=0;i<d.length;i++)
-				{
-					console.log(d[i]);
-				}
-			
-				var timeManLineArray=getTimeManValueArray(absEventRolerPos,d,Na);
-				//console.log("timeManValueArray is "+timeManValueArray);
-				console.log("Na is "+Na);
-				g.selectAll("path.timeMan").remove();
-				
-				//createAbsLine(g,timeManLineArray);
+				var line=new Object();
+				var timeManValueArray=[];
+				line.type="LineString";
+				from=getCoordinates(Nu[0],Na[0],dataRoler);
+				to=getCoordinates(Nu[0],Na[1],dataRoler);
+				line.coordinates=getInvertLocation(from,to);
+				//console("line->invert "+line+" -> "+line)
+				timeManValueArray.push(line);
+				//g.selectAll("path.timeMan").remove();
 				var findRolerLineOff=[-5,-1];
 				g.selectAll("path.timeMan")
 					.data(timeManLineArray[0])
@@ -234,9 +212,14 @@
 					.attr("class","timeMan")
 					.attr("stroke-width", 1)
 					.attr("fill", "none")
-					//.attr("d", path);
+					.attr("stroke",function(){
+						return rolerLineColorSet[2];
+					})
+					.attr("stroke-width",function(d){
+						return d;
+					})
+					.attr("display","block")
 					.attr("d",function(d){
-						//console.log("")
 						var from=new Array(2);
 						var to=new Array(2);
 						from[0]=d.coordinates[0][0]+findRolerLineOff[0];
@@ -246,34 +229,80 @@
 						return  "M"+from+" L"+to+" Z";
 					
 					});
+			}
+			else{
+				if(Nu[0] > Nu[1])
+				{
+					var tmp=Nu[0];
+					Nu[0]=Nu[1];
+					Nu[1]=tmp;
+					tmp=Na[0];
+					Na[0]=Na[1];
+					Na[1]=tmp;
 					
-				g.selectAll("path.timeMan")
-					.data(timeManLineArray[1])
-					.attr("stroke",function(d){
-						return rolerLineColorSet[d-1];
-						/*
-						if(d==1){
-							return color(Nam(Na[0]));
-						}
-						else if(d==2)
-						{
-							return color(Nam(Na[1]));
-						}
-						else{	//d.rolerNum==3
-							return color(19);	//最后一种颜色
-							//return "red";
-						}
-						*/
-					})
-					.attr("stroke-width",function(d){
-						return d;
-					})
-					.attr("display","block");
-					
-				//createAPath(g,[[433,347],[347,433],[522,335],[600,400],[400,600]]);
-			});
+					console.log("after swap Na is "+Na+" Nu is "+Nu);
+				}
 			
-			classie.toggle( menuLeft, 'cbp-spmenu-open' );
+				var pointNum=dataEvent.length;
+				var timeManPathArray=getTimeLinePath(Nu,Na,dataRolerLine,pointNum,dataRoler);
+				
+				create_button(timeManPathArray.length);
+				//d3.select("div.dialog-inner").select("h2").text("共有"+timeManPathArray.length+"条路径");
+				//classie.toggle( this, 'active' );
+				
+				//显示路径
+				d3.selectAll("button.path")
+				.data(timeManPathArray)
+				.on("click",function(d){
+					g.selectAll("path.spot").attr("display","none");
+					
+					console.log("显示路径 d is "+d);
+					for (var i=0;i<d.length;i++)
+					{
+						console.log(d[i]);
+					}
+				
+					var timeManLineArray=getTimeManValueArray(absEventRolerPos,d,Na);
+					//console.log("timeManValueArray is "+timeManValueArray);
+					console.log("Na is "+Na);
+				
+					g.selectAll("path.timeMan").remove();
+					g.selectAll("path.timeMan")
+						.data(timeManLineArray[0])
+						.enter()
+						.append("path")
+						.attr("class","timeMan")
+						.attr("stroke-width", 1)
+						.attr("fill", "none")
+						//.attr("d", path);
+						.attr("d",function(d){
+							//console.log("")
+							var from=new Array(2);
+							var to=new Array(2);
+							from[0]=d.coordinates[0][0]+findRolerLineOff[0];
+							from[1]=d.coordinates[0][1]+findRolerLineOff[1];
+							to[0]=d.coordinates[1][0]+findRolerLineOff[0];
+							to[1]=d.coordinates[1][1]+findRolerLineOff[1];
+							return  "M"+from+" L"+to+" Z";
+						
+						});
+						
+					g.selectAll("path.timeMan")
+						.data(timeManLineArray[1])
+						.attr("stroke",function(d){
+							return rolerLineColorSet[d-1];
+						})
+						.attr("stroke-width",function(d){
+							return d;
+						})
+						.attr("display","block");
+						
+					//createAPath(g,[[433,347],[347,433],[522,335],[600,400],[400,600]]);
+				});
+				
+				classie.toggle( menuLeft, 'cbp-spmenu-open' );
+			}
+			
 		}
 		else{
 			//提示出错：请选择两个点进行查询
