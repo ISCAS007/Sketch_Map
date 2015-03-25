@@ -1,10 +1,10 @@
-var width  = 1250;
-var height = 850;
+var width  = document.body.clientWidth-200;
+var height = document.body.clientHeight;
 var Na=[];
 var Nu=[];
 var rolernum=14,eventnum=14,scenenum=14;
 var svg = d3.select("body").append("svg")
-    .attr("width", width-200)
+    .attr("width", width)
     .attr("height", height)
     .append("g")
     .attr("transform", "translate(0,0)");

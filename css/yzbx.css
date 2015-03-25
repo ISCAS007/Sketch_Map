@@ -8,6 +8,9 @@
 #scene-tooltip.hidden{
 	display: none;
 }
+#gesture_pic.hidden{
+	display: none;
+}
 #scene-tooltip p{
 	//word-wrap: break-word;
 	//font-family: sans-serif;

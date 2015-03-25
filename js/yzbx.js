@@ -493,3 +493,14 @@ function showCanvas()
 	//d3.select("svg").attr("display","none");
 }
 */
+function gestureHelp()
+{
+	if(d3.select("#gesture_pic").attr("class")=="hidden")
+	{
+		d3.select("#gesture_pic").attr("class","show");
+	}
+	else
+	{
+		d3.select("#gesture_pic").attr("class","hidden");
+	}
+}

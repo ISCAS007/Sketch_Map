@@ -2,50 +2,29 @@
 //
 // Startup
 //
-var _isDown, _points, _r, _g, _rc;
+var _isDown, _points, _r, _rc;
 function onLoadEvent()
 {
 	_points = new Array();
 	_r = new DollarRecognizer();
-
-	var canvas = document.getElementById('myCanvas');
-	_g = canvas.getContext('2d');
-	_g.fillStyle = "rgb(0,0,225)";
-	_g.strokeStyle = "rgb(0,0,225)";
-	_g.lineWidth = 3;
-	_g.font = "16px Gentilis";
-	_rc = getCanvasRect(canvas); // canvas rect on page
-	_g.fillStyle = "rgb(255,255,136)";
-	_g.fillRect(0, 0, _rc.width, 20);
-
+	_rc = getBodySize();
 	_isDown = false;
 }
-function getCanvasRect(canvas)
+function getBodySize()
 {
-	var w = canvas.width;
-	var h = canvas.height;
+	//var g=d3.select("svg g");
+	var w = width;
+	var h = height;
 
-	var cx = canvas.offsetLeft;
-	var cy = canvas.offsetTop;
-	while (canvas.offsetParent != null)
-	{
-		canvas = canvas.offsetParent;
-		cx += canvas.offsetLeft;
-		cy += canvas.offsetTop;
-	}
+	var cx = document.body.offsetLeft;
+	var cy = document.body.offsetTop;
+	
 	return {x: cx, y: cy, width: w, height: h};
 }
 function getScrollY()
 {
-	var scrollY = 0;
-	if (typeof(document.body.parentElement) != 'undefined')
-	{
-		scrollY = document.body.parentElement.scrollTop; // IE
-	}
-	else if (typeof(window.pageYOffset) != 'undefined')
-	{
-		scrollY = window.pageYOffset; // FF
-	}
+	var scrollY = document.body.scrollTop;
+	//console.log("scrollY is "+scrollY);
 	return scrollY;
 }
 //
@@ -58,12 +37,9 @@ function mouseDownEvent(x, y)
 	_isDown = true;
 	x -= _rc.x;
 	y -= _rc.y - getScrollY();
-	if (_points.length > 0)
-		_g.clearRect(0, 0, _rc.width, _rc.height);
 	_points.length = 1; // clear
 	_points[0] = new Point(x, y);
 	drawText("Recording unistroke...");
-	_g.fillRect(x - 4, y - 3, 9, 9);
 }
 function mouseMoveEvent(x, y)
 {
@@ -71,20 +47,24 @@ function mouseMoveEvent(x, y)
 	{
 		x -= _rc.x;
 		y -= _rc.y - getScrollY();
+		//console.log("get a point "+x+","+y);
 		_points[_points.length] = new Point(x, y); // append
 		drawConnectedPoint(_points.length - 2, _points.length - 1);
 	}
 }
 function mouseUpEvent(x, y)
 {
+	
 	document.onselectstart = function() { return true; } // enable drag-select
 	document.onmousedown = function() { return true; } // enable drag-select
 	if (_isDown)
 	{
 		_isDown = false;
+		d3.selectAll("path.gesture").remove();
 		if (_points.length >= 10)
 		{
-			var result = _r.Recognize(_points, document.getElementById('useProtractor').checked);
+			//var result = _r.Recognize(_points,document.getElementById('useProtractor').checked);
+			var result = _r.Recognize(_points,false);
 			drawText("Result: " + result.Name + " (" + round(result.Score,2) + ").");
 		}
 		else // fewer than 10 points were inputted
@@ -95,18 +75,20 @@ function mouseUpEvent(x, y)
 }
 function drawText(str)
 {
-	_g.fillStyle = "rgb(255,255,136)";
-	_g.fillRect(0, 0, _rc.width, 20);
-	_g.fillStyle = "rgb(0,0,255)";
-	_g.fillText(str, 1, 14);
+	d3.select("#gesture_tooltip p").text(str);
 }
 function drawConnectedPoint(from, to)
 {
-	_g.beginPath();
-	_g.moveTo(_points[from].X, _points[from].Y);
-	_g.lineTo(_points[to].X, _points[to].Y);
-	_g.closePath();
-	_g.stroke();
+	var f=[],t=[];
+	f[0]=_points[from].X+_rc.x;
+	f[1]=_points[from].Y+_rc.y;// - getScrollY();
+	t[0]=_points[to].X+_rc.x;
+	t[1]=_points[to].Y+_rc.y;// - getScrollY();
+	var svg=d3.select("svg").select("g").append("path")
+				.attr("class","gesture")
+				.attr("fill","none")
+				.attr("stroke","red")
+				.attr("d","M"+f+" L"+t);
 }
 function round(n, d) // round 'n' to 'd' decimals
 {

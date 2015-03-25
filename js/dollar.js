@@ -186,11 +186,13 @@ function DollarRecognizer() // constructor
 }
 //
 // Private helper functions from this point down
+// 从所得的所有点中等间隔取n个点并在必要时调整点的坐标
 //
 function Resample(points, n)
 {
 	var I = PathLength(points) / (n - 1); // interval length
 	var D = 0.0;
+	console.log("points[0] is "+points[0]);
 	var newpoints = new Array(points[0]);
 	for (var i = 1; i < points.length; i++)
 	{
@@ -215,6 +217,7 @@ function IndicativeAngle(points)
 	var c = Centroid(points);
 	return Math.atan2(c.Y - points[0].Y, c.X - points[0].X);
 }
+
 function RotateBy(points, radians) // rotates points around centroid
 {
 	var c = Centroid(points);

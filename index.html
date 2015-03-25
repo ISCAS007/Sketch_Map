@@ -45,13 +45,27 @@
 
 	<script type="text/javascript" src="js/dollar.js"></script>
 	<script type="text/javascript" src="js/gesture.js"></script>
+	<script src="js/d3.min.js"></script>
+	<script src="js/classie.js"></script>
+	<script src="js/dialogFx.js"></script>
+	<script src="js/common.js"></script>
+	<!--各种功能函数-->
+	<script src="js/yzbx.js"></script>
 </head>
-<body onload="onLoadEvent()">
+<body onload="onLoadEvent()" onmousedown="mouseDownEvent(event.clientX, event.clientY)"
+					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
+					onmouseup="mouseUpEvent(event.clientX, event.clientY)">
 <!--草图界面-->
-<table border="0" cellspacing="10">
+<!--
+<table border="0" cellspacing="10" >
 	<tbody>
 	<tr>
-		<td>
+		<td id="td_svg" colspan="2">
+		
+		</td>
+	</tr>
+	<tr>
+		<td style="vertical-align: top; text-align: left;">
 			<img src="pic/unistrokes.gif"><br/>
 			<p>
 				<form style="font-size:10pt">
@@ -64,7 +78,7 @@
 				</form>
 			</p>
 		</td>
-		<td>
+		<td style="vertical-align: top; text-align: left;">
 			<canvas id="myCanvas" width="420" height="400" style="background-color:#dddddd"
 					onmousedown="mouseDownEvent(event.clientX, event.clientY)"
 					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
@@ -76,6 +90,7 @@
 	</tr>
 	</tbody>
 </table>
+-->
 <!--查询界面-->
 <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2"></nav>
 <!--场景共同信息显示界面-->
@@ -138,20 +153,23 @@
 <div ><button data-dialog="somedialog" class="trigger" id="showLeftPush" style= "position:absolute;right:200;top:200;" onclick="find()">查询</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="showSpecial" style= "position:absolute;right:200;top:300;" onclick="shows()">展示</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="reset" style= "position:absolute;right:200;top:400;" onclick="resets()">重置</button></div>
+<div ><button data-dialog="somedialog" class="trigger" id="gesture" style= "position:absolute;right:200;top:500;" onclick="gestureHelp()">手势</button></div>
 
 <!--事件提示-->
 <div id="tooltip" class="hidden hidden">
     <p><strong>提示：</strong></p>
     <p><span id="value">100</span></p>
 </div>
-<script src="js/d3.min.js"></script>
-<script src="js/classie.js"></script>
-<script src="js/dialogFx.js"></script>
-<script src="js/common.js"></script>
+<!--草图手势提示-->
+<div id="gesture_pic" class="hidden" style="position:fixed; left:0px;bottom:100px;">
+	<img src="pic/unistrokes.gif">
+</div>
+<div id="gesture_tooltip" style= "position:fixed; left:0px;bottom:0px;">
+    <p>gesture_tooltip</p>
+</div>
+
 <!--读取文件并展示-->
 <script src="js/ReadFile.js"></script>
-<!--各种功能函数-->
-<script src="js/yzbx.js"></script>
 <script>
     var     menuLeft = document.getElementById( 'cbp-spmenu-s2' ),
             body = document.body;
@@ -171,7 +189,16 @@
 	var find=function(){
 		console.log("show the path .................................");
 		//显示路径数目并创建相应的按钮
-		if(cnt==2&&Nu[0]<Nu[1]){
+		if(cnt==2){
+			if(Nu[0]<Nu[1])
+			{
+				var tmp=Nu[0];
+				Nu[0]=Nu[1];
+				Nu[1]=tmp;
+				tmp=Na[0];
+				Na[0]=Na[1];
+				Na[1]=tmp;
+			}
 			var pointNum=dataEvent.length;
 			var timeManPathArray=getTimeLinePath(Nu,Na,dataRolerLine,pointNum,dataRoler);
 			
