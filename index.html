@@ -55,42 +55,7 @@
 <body onload="onLoadEvent()" onmousedown="mouseDownEvent(event.clientX, event.clientY)"
 					onmousemove="mouseMoveEvent(event.clientX, event.clientY,event)"
 					onmouseup="mouseUpEvent(event.clientX, event.clientY)">
-<!--草图界面-->
-<!--
-<table border="0" cellspacing="10" >
-	<tbody>
-	<tr>
-		<td id="td_svg" colspan="2">
-		
-		</td>
-	</tr>
-	<tr>
-		<td style="vertical-align: top; text-align: left;">
-			<img src="pic/unistrokes.gif"><br/>
-			<p>
-				<form style="font-size:10pt">
-					<input type="radio" name="search" id="useGSS" checked>
-						<span style="font-weight:bold">Use Golden Section Search <i>(original)</i></span>
-					</input><br />
-					<input type="radio" name="search" id="useProtractor">
-						<span style="font-weight:bold">Use Protractor <i>(faster)</i></span>
-					</input>
-				</form>
-			</p>
-		</td>
-		<td style="vertical-align: top; text-align: left;">
-			<canvas id="myCanvas" width="420" height="400" style="background-color:#dddddd"
-					onmousedown="mouseDownEvent(event.clientX, event.clientY)"
-					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
-					onmouseup="mouseUpEvent(event.clientX, event.clientY)"
-					oncontextmenu="return false;">
-				<span style="background-color:#ffff88;">The &lt;canvas&gt; element is not supported by this browser.</span>
-			</canvas>
-		</td>
-	</tr>
-	</tbody>
-</table>
--->
+					
 <!--查询界面-->
 <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2"></nav>
 <!--场景共同信息显示界面-->
@@ -153,7 +118,7 @@
 <div ><button data-dialog="somedialog" class="trigger" id="showLeftPush" style= "position:absolute;right:200;top:200;" onclick="find()">查询</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="showSpecial" style= "position:absolute;right:200;top:300;" onclick="shows()">展示</button></div>
 <div ><button data-dialog="somedialog" class="trigger" id="reset" style= "position:absolute;right:200;top:400;" onclick="resets()">重置</button></div>
-<div ><button data-dialog="somedialog" class="trigger" id="button_gesture" style= "position:absolute;right:200;top:500;" onclick="gestureHelp()">拖动</button></div>
+<div ><button data-dialog="somedialog" class="trigger" id="button_gesture" style= "position:absolute;right:200;top:500;" onclick="gestureHelp()" onmouseover="gesturePicShow()" onmouseout="gesturePicHidden()">拖动</button></div>
 
 <!--事件提示-->
 <div id="tooltip" class="hidden hidden">

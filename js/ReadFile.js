@@ -44,7 +44,6 @@ var rolerLineColorSet=["green","blue","purple"];	//查询路径时，返回路�
 var pos=[width/3,0];	//显示块的信息时，返回的位置
 var stopDrag=false;
 
-
 svg.append("rect")
     .attr("class", "overlay")
 	//.attr("fill","#0000ff")
@@ -197,7 +196,7 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("stroke",function(d,i){
             return "white";
         })
-        .attr("stroke-width",3)
+        .attr("stroke-width",1)
         .attr("class","background")
         .attr("id",function(d){
             return "path-background"+d.number;
@@ -213,6 +212,8 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("stroke-dasharray",0.986192,0.591715,0.197238,0.591715)
         .attr("d", path )
         .on("click",function(d,i){
+			
+			if(stopDrag)	return;
 			//console.log("map i is "+i+" number is "+d.number);
             if(eventchoosenum==0){
                 eventchoose[0]=d.number;
@@ -337,6 +338,8 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("height",30.7)
         //.translate([-61.695,-106.195])
         .on("mouseover",function(d){
+			
+			if(stopDrag) return;
 			//var xPosition=projection(d.coordinates)[0]+50;
 			//var yPosition=projection(d.coordinates)[1]-50;
             var xPosition=parseFloat(d3.event.x);
@@ -357,8 +360,8 @@ d3.json("json//Geo.json", function(error, root) {
         })
         .on("click",function(d,i)
         {
-			//var x=projection(d.coordinates)[0];
-			//var y=projection(d.coordinates)[1];
+			if(stopDrag) return;
+			
 			d3.select("#player")
 				.style("left",playerPos[0]+"px")
 				.style("top",playerPos[1]+"px");
@@ -406,6 +409,8 @@ d3.json("json//Geo.json", function(error, root) {
         .attr("height",32.6/3)
         .attr("display","none")
         .on("click",function(d,i){
+			if(stopDrag) return;
+		
             Na[cnt]= d.name;
             Nu[cnt]= d.number;
             var index=i;
@@ -461,33 +466,6 @@ d3.json("json//Geo.json", function(error, root) {
 			coor[3]=d.coordinates[1][1]+rolerLineOffset[1];
 			return "M"+coor[0]+","+coor[1]+"L"+coor[2]+","+coor[3];
 		});
-		
-	/*
-	g.selectAll("line")
-		.data(absEventPos)
-		.enter()
-		.append("line")
-		.attr("x1",function(d){
-			return d[0];
-		})
-		.attr("y1",function(d)
-		{
-			return d[1];
-		})
-		.attr("x2",400)
-		.attr("y2",400)
-		.attr("stroke","red")
-		.attr("stroke-width",2);
-		*/
-	/* g.append("line").attr("x1",687+25).attr("y1",381+60)
-			.attr("x2",0).attr("y2",0)
-			.attr("stroke","red").attr("stroke-width",2);
-	g.append("line").attr("x1",890+25).attr("y1",376+60)
-			.attr("x2",100).attr("y2",0)
-			.attr("stroke","red").attr("stroke-width",2);
-	g.append("line").attr("x1",947+25).attr("y1",319+60)
-			.attr("x2",200).attr("y2",0)
-			.attr("stroke","red").attr("stroke-width",2); */
 });
 
 //放大缩小

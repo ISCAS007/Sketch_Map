@@ -493,33 +493,22 @@ function showCanvas()
 	//d3.select("svg").attr("display","none");
 }
 */
+function gesturePicShow(){
+	d3.select("#gesture_pic").attr("class","show");//.text("手势优先");
+}
+function gesturePicHidden(){
+	d3.select("#gesture_pic").attr("class","hidden");	
+}
 function gestureHelp()
 {
 	if(stopDrag) {
 		stopDrag=false;
-		d3.select("#gesture_pic").attr("class","hidden");
 		d3.select("#button_gesture").text("拖动");
 	}
 	else {
-		stopDrag=true;
-		d3.select("#gesture_pic").attr("class","show");//.text("手势优先");
+		stopDrag=true;	
 		d3.select("#button_gesture").text("手势");
 	}
-	/*
-	if(d3.select("#gesture_pic").attr("class")=="hidden")
-	{
-		d3.select("#gesture_pic").attr("class","show");
-	}
-	else
-	{
-		d3.select("#gesture_pic").attr("class","hidden");
-	}
-	
-	for(var i=0;i<_r.Unistrokes.length;i++)
-	{
-		console.log(_r.Unistrokes[i].Name);
-	}
-	*/
 }
 
 function result2action(result,from,to,center)
@@ -560,6 +549,10 @@ function result2action(result,from,to,center)
 			}
 		}
 		var num=index+1;
+		d3.select("#player")
+				.style("left",playerPos[0]+"px")
+				.style("top",playerPos[1]+"px");
+				
 		var str="video/";
             str+= num+".mp4";
             clicked(str, num);
@@ -593,6 +586,13 @@ function result2action(result,from,to,center)
 		
 		if(d3.select("image.circle").attr("display")=="none"){
 			console.log("display==none");
+			
+			for(var i=0;i<eventchoosenum;i++)
+			{
+				g.selectAll("#path-background"+eventchoose[i])
+						.attr("stroke","white")
+						.attr("stroke-width",1);
+			}
 			for(var i=0;i<absEventPos.length;i++)
 			{	
 				var p=new Point(absEventPos[i][0],absEventPos[i][1]);
