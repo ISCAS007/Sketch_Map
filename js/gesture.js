@@ -102,6 +102,7 @@ function drawConnectedPoint(from, to)
 	var svg=d3.select("svg").select("g").append("path")
 				.attr("class","gesture")
 				.attr("fill","none")
+				.attr("stroke-width",7)
 				.attr("stroke","red")
 				.attr("d","M"+f+" L"+t);
 }
